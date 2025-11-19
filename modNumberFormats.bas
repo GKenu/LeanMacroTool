@@ -140,7 +140,9 @@ Public Sub LoadFormats(ByRef formats() As String, ByRef enabled() As Boolean)
         "#,##0.0x_);(#,##0.0)x;""-""_);@_)", _
         "[$R$-416]#,##0.0_);([$R$-416]#,##0.0);""-""_);@_)", _
         "[$$-409]#,##0.0_);([$$-409]#,##0.0);""-""_);@_)", _
-        "General" _
+        "dd-mmm-yy_)", _
+        "mmm-yy_)", _
+        "General_)" _
     )
 
     ' Calculate format count dynamically

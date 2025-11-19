@@ -355,6 +355,15 @@ Private Function ParseFormulaReferences(sourceCell As Range) As Collection
     ' Handle last reference if formula ends with a reference
     If currentRef <> "" And inSheet Then
         cellRef = currentRef
+
+        ' Clean up sheet name quotes
+        If Left(sheetName, 1) = "'" Then
+            sheetName = Mid(sheetName, 2)
+        End If
+        If Right(sheetName, 1) = "'" Then
+            sheetName = Left(sheetName, Len(sheetName) - 1)
+        End If
+
         Set expandedRefs = ExpandCellRange(sheetName, cellRef, sourceCell.Worksheet.Parent)
         For Each ref In expandedRefs
             On Error Resume Next

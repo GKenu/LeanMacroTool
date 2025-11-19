@@ -2,6 +2,8 @@
 
 **Version 1.0.4** - 3 Powerful Features via Keyboard Shortcuts & Ribbon Tab
 
+I missed TTS Macros for personal use, so I built my own. Not perfect yet, but feel free to use and contribute!
+
 ## Features
 
 1. **Cycle Number Formats** (Ctrl+Shift+N)
@@ -172,21 +174,22 @@ The dialog stays open so you can explore multiple cells without reopening it!
 
 ## Customizing Number Formats
 
-**Method 1: Via Ribbon**
-1. Click **Lean Macros** tab
-2. Click **Configure** button
-3. Edit the sheet that appears
-4. Click OK when done
+To add, remove, or modify number formats, edit the `LoadFormats` function in `modNumberFormats.bas`:
 
-**Method 2: Via Macro**
-1. **Tools > Macro > Macros**
-2. Run `ConfigureNumberFormats`
-3. Edit the sheet
-4. Click OK
+**Method 1: Edit source file**
+1. Open `modNumberFormats.bas` in a text editor
+2. Find the `allFormats = Array(...)` section (around line 137)
+3. Add, remove, or modify format strings in the array
+4. Re-import the module into your `.xlam` file
 
-The sheet shows:
-- Column A: Number format codes
-- Column B: TRUE (enabled) or FALSE (disabled)
+**Method 2: Edit within Excel VBA**
+1. Open Excel and press **Option+F11** (VBA Editor)
+2. Find `modNumberFormats` module in your add-in
+3. Locate the `LoadFormats` function
+4. Edit the `allFormats = Array(...)` section
+5. Save (Cmd+S) and restart Excel
+
+The array automatically calculates the format count, so just add or remove lines as needed!
 
 ---
 
@@ -195,10 +198,13 @@ The sheet shows:
 1. `#,##0.00_);(#,##0.00);"-"_);@_)` - Thousands with 2 decimals (1,234.56)
 2. `0.0%_);(0.0%);"-"_);@_)` - Percentage (12.3%)
 3. `#,##0.0x_);(#,##0.0)x;"-"_);@_)` - Multiple (2.5x)
-4. `$#,##0.0_);$(#,##0.0);"-"_);@_)` - US Dollars ($1,234.5)
-5. `R$#,##0.0_);R$(#,##0.0);"-"_);@_)` - Brazilian Reals (R$1,234.5)
+4. `[$R$-416]#,##0.0_);([$R$-416]#,##0.0);"-"_);@_)` - Brazilian Reals (R$1,234.5)
+5. `[$$-409]#,##0.0_);([$$-409]#,##0.0);"-"_);@_)` - US Dollars ($1,234.5)
+6. `dd-mmm-yy_)` - Date format (15-Jan-25)
+7. `mmm-yy_)` - Month-year format (Jan-25)
+8. `General_)` - General number format
 
-After the 5th format, pressing Ctrl+Shift+N wraps back to the first format.
+Pressing Ctrl+Shift+N cycles through all formats and wraps back to the original cell format.
 
 ---
 
