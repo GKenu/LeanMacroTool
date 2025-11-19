@@ -8,9 +8,11 @@ Option Explicit
 
 Private Const CONFIG_SHEET_NAME As String = "NumberFormatConfig"
 
-' Module-level variables to track original format
+' Module-level variables to track original format and position in cycle
 Private originalCellAddress As String
 Private originalCellFormat As String
+Private lastAppliedIndex As Integer
+Private lastAppliedAddress As String
 
 ' Ribbon callback - called when ribbon loads
 Public Sub Ribbon_OnLoad(ribbon As IRibbonUI)
@@ -51,11 +53,15 @@ Private Sub CycleNumberFormatsImpl()
     ' Get current format of active cell
     currentFormat = targetRange.Cells(1, 1).NumberFormat
 
-    ' If this is a different cell or first time, store original format
+    ' If this is a different cell, store its current format as the new original and reset cycle
     If cellAddr <> originalCellAddress Then
         originalCellAddress = cellAddr
         originalCellFormat = currentFormat
+        lastAppliedIndex = -1  ' Reset cycle tracking
+        lastAppliedAddress = ""
     End If
+
+    ' IMPORTANT: originalCellFormat is now locked for this cell until we move to a different cell
 
     ' Load formats from configuration
     LoadFormats formats, formatEnabled
@@ -71,14 +77,15 @@ Private Sub CycleNumberFormatsImpl()
         Exit Sub
     End If
 
-    ' Add space for original format at beginning of array
-    ReDim enabledFormats(0 To enabledCount)
+    ' Build array with 1-based indexing (1 to enabledCount+1)
+    ' Index 1 = original format, Indices 2 onwards = configured formats
+    ReDim enabledFormats(1 To enabledCount + 1)
 
-    ' Add original format as index 0
-    enabledFormats(0) = originalCellFormat
+    ' Add original format as index 1
+    enabledFormats(1) = originalCellFormat
 
-    ' Add configured formats starting at index 1
-    j = 1
+    ' Add configured formats starting at index 2
+    j = 2
     For i = LBound(formats) To UBound(formats)
         If formatEnabled(i) Then
             enabledFormats(j) = formats(i)
@@ -86,22 +93,39 @@ Private Sub CycleNumberFormatsImpl()
         End If
     Next i
 
-    ' Find current format in enabled list and move to next
-    nextIndex = 1 ' Default to first configured format if not found
-    For i = LBound(enabledFormats) To UBound(enabledFormats)
-        If currentFormat = enabledFormats(i) Then
-            nextIndex = i + 1
-            If nextIndex > UBound(enabledFormats) Then
-                ' Wrap back to original format (index 0)
-                nextIndex = 0
-            End If
-            Exit For
+    ' Use index tracking for reliable cycling (avoids format string comparison issues)
+    If cellAddr = lastAppliedAddress And lastAppliedIndex >= 1 Then
+        ' We're on the same cell where we last applied a format - use index tracking
+        nextIndex = lastAppliedIndex + 1
+        If nextIndex > UBound(enabledFormats) Then
+            ' Wrap back to original format (index 1)
+            nextIndex = 1
         End If
-    Next i
+    Else
+        ' First cycle on this cell, or format was changed externally
+        ' Try to find current format in the list
+        nextIndex = -1
+        For i = LBound(enabledFormats) To UBound(enabledFormats)
+            If currentFormat = enabledFormats(i) Then
+                nextIndex = i + 1
+                If nextIndex > UBound(enabledFormats) Then
+                    nextIndex = 1
+                End If
+                Exit For
+            End If
+        Next i
+
+        ' If not found, start from first configured format (index 2)
+        If nextIndex = -1 Then nextIndex = 2
+    End If
 
     ' Apply the next format to entire selection
     targetRange.NumberFormat = enabledFormats(nextIndex)
-    
+
+    ' Track this application for next cycle
+    lastAppliedIndex = nextIndex
+    lastAppliedAddress = cellAddr
+
     Exit Sub
     
 ErrorHandler:
@@ -129,22 +153,24 @@ Private Sub ConfigureNumberFormatsImpl()
     ' Get or create config sheet
     Set ws = GetOrCreateConfigSheet()
 
-    ' Make it visible temporarily for editing
-    ws.Visible = xlSheetVisible
-    ws.Activate
+    ' Check current visibility state
+    If ws.Visible = xlSheetVeryHidden Or ws.Visible = xlSheetHidden Then
+        ' Show the sheet for editing
+        ws.Visible = xlSheetVisible
 
-    ' Show instructions
-    msg = "The NumberFormatConfig sheet is now visible." & vbCrLf & vbCrLf & _
-          "Column A: Number format codes" & vbCrLf & _
-          "Column B: TRUE to enable, FALSE to disable" & vbCrLf & vbCrLf & _
-          "Edit the formats as needed, then click OK to save and hide the sheet."
+        ' Switch to the config sheet
+        Application.Goto ws.Range("A1"), True
 
-    response = MsgBox(msg, vbOKCancel + vbInformation, "Configure Number Formats")
+        ' Don't show blocking dialog - just let them edit!
+        ' User will click Configure again when done
+    Else
+        ' Sheet is visible, ask if they want to hide it
+        response = MsgBox("Hide the configuration sheet?", vbYesNo + vbQuestion, "Hide Config")
 
-    If response = vbOK Then
-        ' Hide the sheet again
-        ws.Visible = xlSheetVeryHidden
-        MsgBox "Configuration saved!", vbInformation, "Success"
+        If response = vbYes Then
+            ws.Visible = xlSheetVeryHidden
+            MsgBox "Configuration saved!", vbInformation, "Success"
+        End If
     End If
 
     Exit Sub
