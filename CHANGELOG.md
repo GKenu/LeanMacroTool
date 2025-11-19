@@ -12,23 +12,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Current cell is now included in trace list (index 0)
 - Modeless navigation: dialog stays open for exploring multiple cells
 - Navigate automatically through cell list using +/- or n/p keys
-- Visual indicator (◀) shows current position in list
+- Visual indicator (<--) shows current position in list
 - Direct jump to any cell by typing its index number
-- Improved user experience with emoji icons and clear instructions
 - `install_ribbon.sh` automated installer script for macOS
+- Formula parsing fallback for cross-sheet reference detection
+- Support for localized folder names (e.g., `Add-Ins.localized`)
 
 ### Changed
 - Trace dialog now uses persistent InputBox loop instead of single prompt
 - Dialog displays full formula and origin cell information
 - Enhanced cross-sheet navigation with better error handling
 - Updated navigation commands: +/n (next), -/p (previous), ESC (close)
+- Replaced Unicode emoji with ASCII characters for better compatibility
+- Dialog formatting now displays correctly without garbled characters
+- `GetPrecedents()` now parses formula text when DirectPrecedents fails
 
 ### Fixed
-- Cross-sheet navigation now works correctly (was failing with "Sheet not found")
+- **CRITICAL:** Cross-sheet precedents now detected correctly on Mac Excel
+- **CRITICAL:** Dialog formatting fixed - removed emoji characters causing "ΔΔΔΔΔΔ" display
+- **CRITICAL:** Install script now detects localized Add-ins paths
 - macOS path handling in installation script (spaces in path now handled)
 - Single quote parsing in sheet names
 - Improved error messages show exactly which sheet/cell failed
 - Screen updating disabled during navigation for smoother transitions
+- Formula references like `=SUM(Sheet2!A1:A10)` now properly detected
 
 ## [1.0.2] - 2025-01-17
 

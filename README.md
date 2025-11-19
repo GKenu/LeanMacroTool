@@ -90,21 +90,32 @@ cd /path/to/LeanMacroTool  # Or wherever you saved the files
 ./install_ribbon.sh
 ```
 
-**Manual way:**
-```bash
-cd /path/to/LeanMacroTool  # Or wherever you saved the files
+The script will automatically:
+- Detect your Add-ins folder (even if localized like `Add-Ins.localized`)
+- Find your .xlam file (searches for v1.0.3, v1.0.2, or v1.0.1)
+- Inject the ribbon XML
 
+**Manual way (if needed):**
+```bash
+cd /path/to/LeanMacroTool
+
+# For English macOS:
 python3 inject_ribbon.py \
   "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.3.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
+
+# For localized macOS (Portuguese, etc.):
+python3 inject_ribbon.py \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.3.xlam" \
+  customUI14.xml \
+  _rels_dot_rels_for_customUI.xml
 ```
 
-**Note:** The script expects the add-in to be named `LeanMacroTools_v1.0.3.xlam`. If you named it differently, update the path accordingly.
-
-If the script can't find the file, check the exact filename:
+**Note:** The script auto-detects localized folder names. If it can't find the file, check your exact path:
 ```bash
-ls "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/"
+# Find your actual Add-ins folder:
+find ~/Library -name "Add-*ns*" -type d 2>/dev/null | grep Office
 ```
 
 **Step 3: Restart Excel**

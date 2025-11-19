@@ -1,8 +1,36 @@
 #!/bin/bash
 # Install ribbon into LeanMacroTools add-in
-# This script properly handles paths with spaces on macOS
+# This script properly handles paths with spaces and localized folder names on macOS
 
-ADDINS_PATH="$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins"
+# Try multiple path variations (for localized macOS systems)
+ADDINS_PATHS=(
+    "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized"
+    "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins"
+    "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-Ins"
+)
+
+# Find which Add-ins path exists
+ADDINS_PATH=""
+for path in "${ADDINS_PATHS[@]}"; do
+    if [ -d "$path" ]; then
+        ADDINS_PATH="$path"
+        echo "✓ Found Add-ins folder: $path"
+        break
+    fi
+done
+
+# Check if Add-ins folder was found
+if [ -z "$ADDINS_PATH" ]; then
+    echo "❌ Error: Excel Add-ins folder not found!"
+    echo ""
+    echo "Tried these locations:"
+    for path in "${ADDINS_PATHS[@]}"; do
+        echo "   - $path"
+    done
+    echo ""
+    echo "Please check your Excel installation."
+    exit 1
+fi
 
 # Try to find the xlam file (check multiple versions)
 XLAM_FILE=""
@@ -15,13 +43,14 @@ for version in "v1.0.3" "v1.0.2" "v1.0.1" ""; do
 
     if [ -f "$TEST_FILE" ]; then
         XLAM_FILE="$TEST_FILE"
-        echo "✓ Found: $TEST_FILE"
+        echo "✓ Found add-in file: $(basename "$TEST_FILE")"
         break
     fi
 done
 
 # Check if xlam was found
 if [ -z "$XLAM_FILE" ]; then
+    echo ""
     echo "❌ Error: LeanMacroTools .xlam file not found in:"
     echo "   $ADDINS_PATH"
     echo ""

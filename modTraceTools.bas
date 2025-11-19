@@ -101,11 +101,11 @@ Private Sub ShowTraceDialog(originCell As Range, links As Collection, isPreceden
         If originCell.HasFormula Then
             msg = msg & "Formula: " & originCell.Formula & vbCrLf
         End If
-        msg = msg & vbCrLf & "📍 LINKED CELLS:" & vbCrLf & vbCrLf
+        msg = msg & vbCrLf & ">> LINKED CELLS:" & vbCrLf & vbCrLf
 
         ' Add current cell to list first (index 0)
         msg = msg & "  0. [CURRENT] " & GetFullAddress(originCell)
-        If currentIndex = 0 Then msg = msg & " ◀"
+        If currentIndex = 0 Then msg = msg & " <--"
         msg = msg & vbCrLf
 
         ' Show all linked cells
@@ -113,23 +113,23 @@ Private Sub ShowTraceDialog(originCell As Range, links As Collection, isPreceden
         i = 1
         For Each item In links
             msg = msg & "  " & i & ". " & item
-            If i = currentIndex Then msg = msg & " ◀"
+            If i = currentIndex Then msg = msg & " <--"
             msg = msg & vbCrLf
             i = i + 1
         Next item
 
-        msg = msg & vbCrLf & "━━━━━━━━━━━━━━━━━━━━━" & vbCrLf
-        msg = msg & "⌨️  NAVIGATE:" & vbCrLf
-        msg = msg & "  • Type number (0-" & links.Count & ") + Enter to jump" & vbCrLf
-        msg = msg & "  • Type + or n = Next cell" & vbCrLf
-        msg = msg & "  • Type - or p = Previous cell" & vbCrLf
-        msg = msg & "  • Press ESC or Cancel = Close" & vbCrLf
+        msg = msg & vbCrLf & "----------------------------------------" & vbCrLf
+        msg = msg & ">> HOW TO NAVIGATE:" & vbCrLf
+        msg = msg & "  - Type number (0-" & links.Count & ") + Enter to jump" & vbCrLf
+        msg = msg & "  - Type + or n = Next cell" & vbCrLf
+        msg = msg & "  - Type - or p = Previous cell" & vbCrLf
+        msg = msg & "  - Press ESC or Cancel = Close" & vbCrLf
 
         ' Show current cell being viewed
         If currentIndex = 0 Then
-            msg = msg & vbCrLf & "👁️  Viewing: [CURRENT] " & GetFullAddress(originCell)
+            msg = msg & vbCrLf & ">> Currently viewing: [CURRENT] " & GetFullAddress(originCell)
         Else
-            msg = msg & vbCrLf & "👁️  Viewing: " & links(currentIndex)
+            msg = msg & vbCrLf & ">> Currently viewing: " & links(currentIndex)
         End If
 
         response = InputBox(msg, title, "")
@@ -190,38 +190,212 @@ ErrorHandler:
     MsgBox "Error showing trace dialog: " & Err.Description, vbCritical, "Error"
 End Sub
 
-' Get precedents with cross-sheet support
+' Get precedents with cross-sheet support (improved for Mac compatibility)
 Public Function GetPrecedents(sourceCell As Range) As Collection
     On Error GoTo ErrorHandler
-    
+
     Dim precedents As Range
     Dim area As Range
     Dim cell As Range
     Dim result As New Collection
     Dim cellAddress As String
-    
+    Dim parsedRefs As Collection
+
+    Set result = New Collection
     Set GetPrecedents = result
-    
+
+    ' Try DirectPrecedents first (works for same-sheet references)
     On Error Resume Next
     Set precedents = sourceCell.DirectPrecedents
     On Error GoTo ErrorHandler
-    
-    If precedents Is Nothing Then Exit Function
-    
-    For Each area In precedents.Areas
-        For Each cell In area.Cells
-            cellAddress = GetFullAddress(cell)
+
+    If Not precedents Is Nothing Then
+        ' Add cells from DirectPrecedents
+        For Each area In precedents.Areas
+            For Each cell In area.Cells
+                cellAddress = GetFullAddress(cell)
+                On Error Resume Next
+                result.Add cellAddress
+                On Error GoTo ErrorHandler
+            Next cell
+        Next area
+    End If
+
+    ' If DirectPrecedents returned nothing or we have a formula, also parse the formula
+    ' This catches cross-sheet references that DirectPrecedents might miss on Mac
+    If sourceCell.HasFormula Then
+        Set parsedRefs = ParseFormulaReferences(sourceCell)
+
+        ' Add parsed references that aren't already in the list
+        Dim ref As Variant
+        For Each ref In parsedRefs
             On Error Resume Next
-            result.Add cellAddress
+            result.Add CStr(ref)  ' Will fail silently if duplicate
             On Error GoTo ErrorHandler
-        Next cell
-    Next area
-    
+        Next ref
+    End If
+
     Set GetPrecedents = result
     Exit Function
-    
+
 ErrorHandler:
-    Set GetPrecedents = New Collection
+    Set GetPrecedents = result  ' Return what we have so far
+End Function
+
+' Parse formula string to extract cell references (Mac-compatible fallback)
+Private Function ParseFormulaReferences(sourceCell As Range) As Collection
+    On Error GoTo ErrorHandler
+
+    Dim result As New Collection
+    Dim formula As String
+    Dim i As Integer
+    Dim char As String
+    Dim currentRef As String
+    Dim inSheet As Boolean
+    Dim inQuote As Boolean
+    Dim sheetName As String
+    Dim cellRef As String
+    Dim fullRef As String
+
+    Set ParseFormulaReferences = result
+
+    If Not sourceCell.HasFormula Then Exit Function
+
+    formula = sourceCell.Formula
+    currentRef = ""
+    inSheet = False
+    inQuote = False
+    sheetName = ""
+
+    ' Simple parser: look for patterns like Sheet2!A1 or 'Sheet Name'!B5
+    For i = 1 To Len(formula)
+        char = Mid(formula, i, 1)
+
+        ' Handle quoted sheet names
+        If char = "'" Then
+            inQuote = Not inQuote
+            currentRef = currentRef & char
+        ' Handle sheet separator
+        ElseIf char = "!" And Not inQuote Then
+            inSheet = True
+            sheetName = currentRef
+            currentRef = ""
+        ' Handle cell reference characters
+        ElseIf (char >= "A" And char <= "Z") Or (char >= "a" And char <= "z") Or _
+               (char >= "0" And char <= "9") Or char = "$" Or char = ":" Or _
+               (inQuote And char <> "'") Then
+            currentRef = currentRef & char
+        ' End of reference
+        Else
+            If currentRef <> "" And inSheet Then
+                ' We have a cross-sheet reference
+                cellRef = currentRef
+                fullRef = sheetName & "!" & cellRef
+
+                ' Clean up sheet name quotes
+                If Left(sheetName, 1) = "'" Then
+                    sheetName = Mid(sheetName, 2)
+                End If
+                If Right(sheetName, 1) = "'" Then
+                    sheetName = Left(sheetName, Len(sheetName) - 1)
+                End If
+
+                ' Expand ranges (e.g., A1:A10 becomes A1, A2, ..., A10)
+                Dim expandedRefs As Collection
+                Set expandedRefs = ExpandCellRange(sheetName, cellRef, sourceCell.Worksheet.Parent)
+
+                Dim ref As Variant
+                For Each ref In expandedRefs
+                    On Error Resume Next
+                    result.Add CStr(ref)
+                    On Error GoTo ErrorHandler
+                Next ref
+
+                inSheet = False
+                sheetName = ""
+            ElseIf currentRef <> "" And Not inSheet Then
+                ' Same-sheet reference - add sheet name
+                cellRef = currentRef
+
+                ' Expand ranges
+                Set expandedRefs = ExpandCellRange(sourceCell.Worksheet.Name, cellRef, sourceCell.Worksheet.Parent)
+
+                For Each ref In expandedRefs
+                    On Error Resume Next
+                    result.Add CStr(ref)
+                    On Error GoTo ErrorHandler
+                Next ref
+            End If
+
+            currentRef = ""
+        End If
+    Next i
+
+    ' Handle last reference if formula ends with a reference
+    If currentRef <> "" And inSheet Then
+        cellRef = currentRef
+        Set expandedRefs = ExpandCellRange(sheetName, cellRef, sourceCell.Worksheet.Parent)
+        For Each ref In expandedRefs
+            On Error Resume Next
+            result.Add CStr(ref)
+            On Error GoTo ErrorHandler
+        Next ref
+    ElseIf currentRef <> "" Then
+        Set expandedRefs = ExpandCellRange(sourceCell.Worksheet.Name, currentRef, sourceCell.Worksheet.Parent)
+        For Each ref In expandedRefs
+            On Error Resume Next
+            result.Add CStr(ref)
+            On Error GoTo ErrorHandler
+        Next ref
+    End If
+
+    Set ParseFormulaReferences = result
+    Exit Function
+
+ErrorHandler:
+    Set ParseFormulaReferences = result
+End Function
+
+' Expand cell range (e.g., A1:A10) into individual cells
+Private Function ExpandCellRange(sheetName As String, cellRef As String, wb As Workbook) As Collection
+    On Error GoTo ErrorHandler
+
+    Dim result As New Collection
+    Dim ws As Worksheet
+    Dim rng As Range
+    Dim cell As Range
+    Dim fullAddr As String
+
+    Set ExpandCellRange = result
+
+    ' Get worksheet
+    On Error Resume Next
+    Set ws = wb.Worksheets(sheetName)
+    If ws Is Nothing Then Set ws = wb.Sheets(sheetName)
+    On Error GoTo ErrorHandler
+
+    If ws Is Nothing Then Exit Function
+
+    ' Get range
+    On Error Resume Next
+    Set rng = ws.Range(cellRef)
+    On Error GoTo ErrorHandler
+
+    If rng Is Nothing Then Exit Function
+
+    ' Add each cell in range
+    For Each cell In rng.Cells
+        fullAddr = GetFullAddress(cell)
+        On Error Resume Next
+        result.Add fullAddr
+        On Error GoTo ErrorHandler
+    Next cell
+
+    Set ExpandCellRange = result
+    Exit Function
+
+ErrorHandler:
+    Set ExpandCellRange = result
 End Function
 
 ' Get dependents with cross-sheet support
