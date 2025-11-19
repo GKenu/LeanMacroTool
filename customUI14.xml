@@ -4,20 +4,13 @@
     <tabs>
       <tab id="LeanMacroTools" label="Lean Macros">
         <group id="grpFormatting" label="Number Formatting">
-          <button id="btnCycleFormats" 
-                  label="Cycle Formats" 
+          <button id="btnCycleFormats"
+                  label="Cycle Formats"
                   size="large"
                   imageMso="NumberFormatGallery"
                   onAction="CycleCustomNumberFormats"
                   screentip="Cycle Number Formats"
                   supertip="Cycle through custom number formats. Shortcut: Ctrl+Shift+N"/>
-          <button id="btnConfigureFormats" 
-                  label="Configure" 
-                  size="normal"
-                  imageMso="TableStylesGallery"
-                  onAction="ConfigureNumberFormats"
-                  screentip="Configure Formats"
-                  supertip="Customize which number formats appear in the cycle"/>
         </group>
         <group id="grpTracing" label="Formula Tracing">
           <button id="btnTracePrecedents" 

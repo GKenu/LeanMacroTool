@@ -5,6 +5,31 @@ All notable changes to LeanMacroTool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2025-01-18
+
+### Added
+- Original format tracking: cycling now returns to cell's original format
+- Keyboard wrapper functions for compatibility with both ribbon and shortcuts
+- Support for `IRibbonControl` parameter in all ribbon callbacks
+
+### Changed
+- Format cycling now includes original format at index 0
+- Cycle order: **Original** → Thousands → Percentage → Multiples → USD → BRL → **Original**
+- Ribbon callbacks now use proper Office 2007+ signature: `Sub Name(control As IRibbonControl)`
+- Workbook_Open now calls wrapper functions: `CycleFormatsKeyboard`, `TracePrecedentsKeyboard`, `TraceDependentsKeyboard`
+
+### Fixed
+- **CRITICAL:** Ribbon buttons now work! Fixed "Wrong number of arguments" error
+- **CRITICAL:** Configure button in ribbon now functional
+- **CRITICAL:** Format cycling now returns to original format instead of getting stuck
+- All ribbon callbacks properly accept IRibbonControl parameter
+
+### Technical Details
+- Split public functions into ribbon callbacks (with IRibbonControl) and implementation functions
+- Module-level variables track original cell address and format
+- Backward compatible: keyboard shortcuts still work through wrapper functions
+- Architecture supports both ribbon button clicks and keyboard shortcuts
+
 ## [1.0.3] - 2025-01-18
 
 ### Added

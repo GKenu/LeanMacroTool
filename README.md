@@ -1,12 +1,15 @@
 # LEAN MACRO TOOLS FOR EXCEL MAC
 
-**Version 1.0.3** - 3 Powerful Features via Keyboard Shortcuts & Ribbon Tab
+**Version 1.0.4** - 3 Powerful Features via Keyboard Shortcuts & Ribbon Tab
+
+I missed TTS Macros for personal use, so I built my own. Not perfect yet, but feel free to use and contribute!
 
 ## Features
 
 1. **Cycle Number Formats** (Ctrl+Shift+N)
-   - Cycles through: Thousands → Percentage → Multiples → USD → BRL → (wraps back to Thousands)
-   - Customizable format list
+   - Cycles through: Original → Thousands → Percentage → Multiples → USD → BRL → (wraps back to Original)
+   - **NEW:** Returns to cell's original format!
+   - Customizable format list via ribbon button
 
 2. **Trace Precedents** (Ctrl+Shift+T)
    - Shows cells that feed into formulas
@@ -45,11 +48,14 @@ You should see both modules in the left panel.
 
 ```vba
 Private Sub Workbook_Open()
-    Application.OnKey "^+N", "CycleCustomNumberFormats"
-    Application.OnKey "^+T", "TracePrecedentsDialog"
-    Application.OnKey "^+Y", "TraceDependentsDialog"
+    ' Keyboard shortcuts using wrapper functions
+    Application.OnKey "^+N", "CycleFormatsKeyboard"
+    Application.OnKey "^+T", "TracePrecedentsKeyboard"
+    Application.OnKey "^+Y", "TraceDependentsKeyboard"
 End Sub
 ```
+
+**Note:** v1.0.4 uses keyboard wrapper functions to support both ribbon buttons and keyboard shortcuts.
 
 3. **File > Save** (Cmd+S)
 
@@ -63,7 +69,7 @@ End Sub
    **Tip:** Press **Cmd+Shift+G**, paste path above, replace [YourName]
 
 4. **File Format:** **Excel Macro-Enabled Add-In (.xlam)**
-5. **Name:** `LeanMacroTools_v1.0.3`
+5. **Name:** `LeanMacroTools_v1.0.4`
 6. **Save**
 7. Close the workbook
 
@@ -101,13 +107,13 @@ cd /path/to/LeanMacroTool
 
 # For English macOS:
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.3.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.4.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 
 # For localized macOS (Portuguese, etc.):
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.3.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.4.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 ```
@@ -168,21 +174,22 @@ The dialog stays open so you can explore multiple cells without reopening it!
 
 ## Customizing Number Formats
 
-**Method 1: Via Ribbon**
-1. Click **Lean Macros** tab
-2. Click **Configure** button
-3. Edit the sheet that appears
-4. Click OK when done
+To add, remove, or modify number formats, edit the `LoadFormats` function in `modNumberFormats.bas`:
 
-**Method 2: Via Macro**
-1. **Tools > Macro > Macros**
-2. Run `ConfigureNumberFormats`
-3. Edit the sheet
-4. Click OK
+**Method 1: Edit source file**
+1. Open `modNumberFormats.bas` in a text editor
+2. Find the `allFormats = Array(...)` section (around line 137)
+3. Add, remove, or modify format strings in the array
+4. Re-import the module into your `.xlam` file
 
-The sheet shows:
-- Column A: Number format codes
-- Column B: TRUE (enabled) or FALSE (disabled)
+**Method 2: Edit within Excel VBA**
+1. Open Excel and press **Option+F11** (VBA Editor)
+2. Find `modNumberFormats` module in your add-in
+3. Locate the `LoadFormats` function
+4. Edit the `allFormats = Array(...)` section
+5. Save (Cmd+S) and restart Excel
+
+The array automatically calculates the format count, so just add or remove lines as needed!
 
 ---
 
@@ -191,10 +198,13 @@ The sheet shows:
 1. `#,##0.00_);(#,##0.00);"-"_);@_)` - Thousands with 2 decimals (1,234.56)
 2. `0.0%_);(0.0%);"-"_);@_)` - Percentage (12.3%)
 3. `#,##0.0x_);(#,##0.0)x;"-"_);@_)` - Multiple (2.5x)
-4. `$#,##0.0_);$(#,##0.0);"-"_);@_)` - US Dollars ($1,234.5)
-5. `R$#,##0.0_);R$(#,##0.0);"-"_);@_)` - Brazilian Reals (R$1,234.5)
+4. `[$R$-416]#,##0.0_);([$R$-416]#,##0.0);"-"_);@_)` - Brazilian Reals (R$1,234.5)
+5. `[$$-409]#,##0.0_);([$$-409]#,##0.0);"-"_);@_)` - US Dollars ($1,234.5)
+6. `dd-mmm-yy_)` - Date format (15-Jan-25)
+7. `mmm-yy_)` - Month-year format (Jan-25)
+8. `General_)` - General number format
 
-After the 5th format, pressing Ctrl+Shift+N wraps back to the first format.
+Pressing Ctrl+Shift+N cycles through all formats and wraps back to the original cell format.
 
 ---
 
@@ -255,14 +265,22 @@ Make sure all 3 files are in the same folder:
 
 ## Version History
 
-### v1.0.3 (Current)
+### v1.0.4 (Current)
+- ✨ **NEW:** Original format tracking - cycling returns to cell's original format!
+- 🐛 **FIXED:** Ribbon buttons now work (fixed callback signatures)
+- 🐛 **FIXED:** Configure button in ribbon functional
+- 🐛 **FIXED:** Format cycling returns to original instead of getting stuck
+- 📝 Cycle order: Original → Thousands → Percentage → Multiples → USD → BRL → Original
+- 📝 Updated Workbook_Open to use keyboard wrapper functions
+
+### v1.0.3
 - ✨ **NEW:** Interactive keyboard navigation for trace dialogs
 - ✨ **NEW:** Dialog stays open for exploring multiple cells
 - ✨ **NEW:** Current cell included in trace list (index 0)
 - ✨ **NEW:** Navigate with +/- or n/p keys through cells automatically
 - 🐛 **FIXED:** Cross-sheet navigation now works correctly
 - 🐛 **FIXED:** macOS path handling in install script
-- 📝 Improved error messages with detailed debugging info
+- 🐛 **FIXED:** Dialog formatting (removed emoji characters)
 
 ### v1.0.2
 - Initial release with basic trace functionality

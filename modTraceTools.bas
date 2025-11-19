@@ -4,8 +4,18 @@ Option Explicit
 ' Enhanced precedent and dependent tracing - Mac optimized
 ' Uses immediate navigation without OK button requirement
 
-' Show precedents dialog
-Public Sub TracePrecedentsDialog()
+' Ribbon callback wrapper for Trace Precedents
+Public Sub TracePrecedentsDialog(Optional control As IRibbonControl = Nothing)
+    TracePrecedentsImpl
+End Sub
+
+' Keyboard shortcut wrapper for Trace Precedents
+Public Sub TracePrecedentsKeyboard()
+    TracePrecedentsImpl
+End Sub
+
+' Implementation: Show precedents dialog
+Private Sub TracePrecedentsImpl()
     On Error GoTo ErrorHandler
 
     Dim activeCell As Range
@@ -43,8 +53,18 @@ ErrorHandler:
     MsgBox "Error tracing precedents: " & Err.Description, vbCritical, "Error"
 End Sub
 
-' Show dependents dialog
-Public Sub TraceDependentsDialog()
+' Ribbon callback wrapper for Trace Dependents
+Public Sub TraceDependentsDialog(Optional control As IRibbonControl = Nothing)
+    TraceDependentsImpl
+End Sub
+
+' Keyboard shortcut wrapper for Trace Dependents
+Public Sub TraceDependentsKeyboard()
+    TraceDependentsImpl
+End Sub
+
+' Implementation: Show dependents dialog
+Private Sub TraceDependentsImpl()
     On Error GoTo ErrorHandler
 
     Dim activeCell As Range
@@ -221,16 +241,17 @@ Public Function GetPrecedents(sourceCell As Range) As Collection
         Next area
     End If
 
-    ' If DirectPrecedents returned nothing or we have a formula, also parse the formula
+    ' Only parse formula if DirectPrecedents returned nothing
     ' This catches cross-sheet references that DirectPrecedents might miss on Mac
-    If sourceCell.HasFormula Then
+    ' and prevents duplication when DirectPrecedents works correctly
+    If result.Count = 0 And sourceCell.HasFormula Then
         Set parsedRefs = ParseFormulaReferences(sourceCell)
 
-        ' Add parsed references that aren't already in the list
+        ' Add parsed references
         Dim ref As Variant
         For Each ref In parsedRefs
             On Error Resume Next
-            result.Add CStr(ref)  ' Will fail silently if duplicate
+            result.Add CStr(ref)
             On Error GoTo ErrorHandler
         Next ref
     End If
@@ -334,6 +355,15 @@ Private Function ParseFormulaReferences(sourceCell As Range) As Collection
     ' Handle last reference if formula ends with a reference
     If currentRef <> "" And inSheet Then
         cellRef = currentRef
+
+        ' Clean up sheet name quotes
+        If Left(sheetName, 1) = "'" Then
+            sheetName = Mid(sheetName, 2)
+        End If
+        If Right(sheetName, 1) = "'" Then
+            sheetName = Left(sheetName, Len(sheetName) - 1)
+        End If
+
         Set expandedRefs = ExpandCellRange(sheetName, cellRef, sourceCell.Worksheet.Parent)
         For Each ref In expandedRefs
             On Error Resume Next
