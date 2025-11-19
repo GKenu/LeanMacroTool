@@ -73,7 +73,7 @@ Private Sub CycleNumberFormatsImpl()
     Next i
 
     If enabledCount = 0 Then
-        MsgBox "No number formats are enabled. Edit the NumberFormatConfig sheet to enable formats.", vbExclamation, "No Formats"
+        MsgBox "No number formats are enabled. Please check format configuration.", vbExclamation, "No Formats"
         Exit Sub
     End If
 
@@ -176,11 +176,11 @@ UseDefaults:
     enabled(3) = True
 
     ' Format 4: Brazilian Real
-    formats(4) = "$#,##0.0_);$(#,##0.0);""-""_);@_)"
+    formats(4) = "R$ #,##0.0_);(R$ #,##0.0);""-""_);@_)"
     enabled(4) = True
 
     ' Format 5: USD
-    formats(5) = ""$"#,##0.0_);"$"(#,##0.0);""-""_);@_)"
+    formats(5) = "US$ #,##0.0_);(US$ #,##0.0);""-""_);@_)"
     enabled(5) = True
 End Sub
 
@@ -212,10 +212,10 @@ Private Function GetOrCreateConfigSheet() As Worksheet
             .Cells(4, 1).Value = "#,##0.0x_);(#,##0.0)x;""-""_);@_)"
             .Cells(4, 2).Value = "TRUE"
 
-            .Cells(5, 1).Value = "$#,##0.0_);$(#,##0.0);""-""_);@_)"
+            .Cells(5, 1).Value = "R$ #,##0.0_);(R$ #,##0.0);""-""_);@_)"
             .Cells(5, 2).Value = "TRUE"
 
-            .Cells(6, 1).Value = "R$#,##0.0_);R$(#,##0.0);""-""_);@_)"
+            .Cells(6, 1).Value = "US$ #,##0.0_);(US$ #,##0.0);""-""_);@_)"
             .Cells(6, 2).Value = "TRUE"
 
             ' Format columns
