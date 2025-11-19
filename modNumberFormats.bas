@@ -6,8 +6,6 @@ Option Explicit
 ' Purpose: Cycle through custom number formats
 ' ================================================================
 
-Private Const CONFIG_SHEET_NAME As String = "NumberFormatConfig"
-
 ' Module-level variables to track original format and position in cycle
 Private originalCellAddress As String
 Private originalCellFormat As String
@@ -132,34 +130,9 @@ ErrorHandler:
     MsgBox "Error cycling number formats: " & Err.Description, vbCritical, "Error"
 End Sub
 
-' Load formats from hidden config sheet
+' Load hardcoded number formats
 Public Sub LoadFormats(ByRef formats() As String, ByRef enabled() As Boolean)
-    On Error GoTo UseDefaults
-
-    Dim ws As Worksheet
-    Dim i As Integer
-    Dim lastRow As Long
-
-    Set ws = GetOrCreateConfigSheet()
-
-    ' Read formats from sheet
-    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
-    If lastRow < 2 Then GoTo UseDefaults
-
-    ReDim formats(1 To lastRow - 1)
-    ReDim enabled(1 To lastRow - 1)
-
-    For i = 2 To lastRow
-        If ws.Cells(i, 1).Value <> "" Then
-            formats(i - 1) = ws.Cells(i, 1).Value
-            enabled(i - 1) = (UCase(Trim(CStr(ws.Cells(i, 2).Value))) = "TRUE")
-        End If
-    Next i
-
-    Exit Sub
-
-UseDefaults:
-    ' Return default formats if error or no config exists
+    ' Return hardcoded default formats
     ReDim formats(1 To 5)
     ReDim enabled(1 To 5)
 
@@ -183,50 +156,5 @@ UseDefaults:
     formats(5) = "US$#,##0.0_);US$(#,##0.0);""-""_);@_)"
     enabled(5) = True
 End Sub
-
-' Get or create the configuration sheet
-Private Function GetOrCreateConfigSheet() As Worksheet
-    On Error Resume Next
-    Set GetOrCreateConfigSheet = ThisWorkbook.Sheets(CONFIG_SHEET_NAME)
-
-    If GetOrCreateConfigSheet Is Nothing Then
-        On Error GoTo 0
-        ' Create new config sheet
-        Set GetOrCreateConfigSheet = ThisWorkbook.Sheets.Add
-        GetOrCreateConfigSheet.Name = CONFIG_SHEET_NAME
-
-        ' Set up headers and default data
-        With GetOrCreateConfigSheet
-            .Cells(1, 1).Value = "Format"
-            .Cells(1, 2).Value = "Enabled"
-            .Cells(1, 1).Font.Bold = True
-            .Cells(1, 2).Font.Bold = True
-
-            ' Default formats
-            .Cells(2, 1).Value = "#,##0.00_);(#,##0.00);""-""_);@_)"
-            .Cells(2, 2).Value = "TRUE"
-
-            .Cells(3, 1).Value = "0.0%_);(0.0%);""-""_);@_)"
-            .Cells(3, 2).Value = "TRUE"
-
-            .Cells(4, 1).Value = "#,##0.0x_);(#,##0.0)x;""-""_);@_)"
-            .Cells(4, 2).Value = "TRUE"
-
-            .Cells(5, 1).Value = "R$#,##0.0_);R$(#,##0.0);""-""_);@_)"
-            .Cells(5, 2).Value = "TRUE"
-
-            .Cells(6, 1).Value = "US$#,##0.0_);US$(#,##0.0);""-""_);@_)"
-            .Cells(6, 2).Value = "TRUE"
-
-            ' Format columns
-            .Columns(1).ColumnWidth = 50
-            .Columns(2).ColumnWidth = 12
-        End With
-
-        ' Hide the sheet
-        GetOrCreateConfigSheet.Visible = xlSheetVeryHidden
-    End If
-End Function
-
 
 ' ================================================================
