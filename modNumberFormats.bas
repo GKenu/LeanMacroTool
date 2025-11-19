@@ -8,15 +8,29 @@ Option Explicit
 
 Private Const CONFIG_SHEET_NAME As String = "NumberFormatConfig"
 
+' Module-level variables to track original format
+Private originalCellAddress As String
+Private originalCellFormat As String
+
 ' Ribbon callback - called when ribbon loads
 Public Sub Ribbon_OnLoad(ribbon As IRibbonUI)
     ' Ribbon loaded successfully
 End Sub
 
-' Main macro: Cycle through number formats
-Public Sub CycleCustomNumberFormats()
+' Ribbon callback wrapper - called by ribbon buttons
+Public Sub CycleCustomNumberFormats(Optional control As IRibbonControl = Nothing)
+    CycleNumberFormatsImpl
+End Sub
+
+' Keyboard shortcut wrapper - called by Application.OnKey
+Public Sub CycleFormatsKeyboard()
+    CycleNumberFormatsImpl
+End Sub
+
+' Implementation: Cycle through number formats with original format tracking
+Private Sub CycleNumberFormatsImpl()
     On Error GoTo ErrorHandler
-    
+
     Dim formats() As String
     Dim formatEnabled() As Boolean
     Dim enabledFormats() As String
@@ -25,22 +39,45 @@ Public Sub CycleCustomNumberFormats()
     Dim currentFormat As String
     Dim nextIndex As Integer
     Dim targetRange As Range
-    
+    Dim cellAddr As String
+
+    ' Get current selection
+    Set targetRange = Selection
+    If targetRange Is Nothing Then Exit Sub
+
+    ' Track the cell address to detect if user changed cells
+    cellAddr = targetRange.Cells(1, 1).Address(External:=True)
+
+    ' Get current format of active cell
+    currentFormat = targetRange.Cells(1, 1).NumberFormat
+
+    ' If this is a different cell or first time, store original format
+    If cellAddr <> originalCellAddress Then
+        originalCellAddress = cellAddr
+        originalCellFormat = currentFormat
+    End If
+
     ' Load formats from configuration
     LoadFormats formats, formatEnabled
     
-    ' Build array of only enabled formats
+    ' Build array of enabled formats, INCLUDING original format
     enabledCount = 0
     For i = LBound(formatEnabled) To UBound(formatEnabled)
         If formatEnabled(i) Then enabledCount = enabledCount + 1
     Next i
-    
+
     If enabledCount = 0 Then
         MsgBox "No number formats are enabled. Run ConfigureNumberFormats to set up.", vbExclamation, "No Formats"
         Exit Sub
     End If
-    
-    ReDim enabledFormats(1 To enabledCount)
+
+    ' Add space for original format at beginning of array
+    ReDim enabledFormats(0 To enabledCount)
+
+    ' Add original format as index 0
+    enabledFormats(0) = originalCellFormat
+
+    ' Add configured formats starting at index 1
     j = 1
     For i = LBound(formats) To UBound(formats)
         If formatEnabled(i) Then
@@ -48,27 +85,20 @@ Public Sub CycleCustomNumberFormats()
             j = j + 1
         End If
     Next i
-    
-    ' Get current selection
-    Set targetRange = Selection
-    If targetRange Is Nothing Then Exit Sub
-    
-    ' Get current format of active cell
-    currentFormat = targetRange.Cells(1, 1).NumberFormat
-    
+
     ' Find current format in enabled list and move to next
-    nextIndex = 1 ' Default to first format if not found
+    nextIndex = 1 ' Default to first configured format if not found
     For i = LBound(enabledFormats) To UBound(enabledFormats)
         If currentFormat = enabledFormats(i) Then
             nextIndex = i + 1
             If nextIndex > UBound(enabledFormats) Then
-                ' Wrap back to first format
-                nextIndex = LBound(enabledFormats)
+                ' Wrap back to original format (index 0)
+                nextIndex = 0
             End If
             Exit For
         End If
     Next i
-    
+
     ' Apply the next format to entire selection
     targetRange.NumberFormat = enabledFormats(nextIndex)
     
@@ -78,37 +108,47 @@ ErrorHandler:
     MsgBox "Error cycling number formats: " & Err.Description, vbCritical, "Error"
 End Sub
 
-' Configure number formats (simplified version without UserForm)
-Public Sub ConfigureNumberFormats()
+' Ribbon callback wrapper for Configure button
+Public Sub ConfigureNumberFormats(Optional control As IRibbonControl = Nothing)
+    ConfigureNumberFormatsImpl
+End Sub
+
+' Keyboard shortcut wrapper for Configure
+Public Sub ConfigureFormatsKeyboard()
+    ConfigureNumberFormatsImpl
+End Sub
+
+' Implementation: Configure number formats (simplified version without UserForm)
+Private Sub ConfigureNumberFormatsImpl()
     On Error GoTo ErrorHandler
-    
+
     Dim ws As Worksheet
     Dim response As VbMsgBoxResult
     Dim msg As String
-    
+
     ' Get or create config sheet
     Set ws = GetOrCreateConfigSheet()
-    
+
     ' Make it visible temporarily for editing
     ws.Visible = xlSheetVisible
     ws.Activate
-    
+
     ' Show instructions
     msg = "The NumberFormatConfig sheet is now visible." & vbCrLf & vbCrLf & _
           "Column A: Number format codes" & vbCrLf & _
           "Column B: TRUE to enable, FALSE to disable" & vbCrLf & vbCrLf & _
           "Edit the formats as needed, then click OK to save and hide the sheet."
-    
+
     response = MsgBox(msg, vbOKCancel + vbInformation, "Configure Number Formats")
-    
+
     If response = vbOK Then
         ' Hide the sheet again
         ws.Visible = xlSheetVeryHidden
         MsgBox "Configuration saved!", vbInformation, "Success"
     End If
-    
+
     Exit Sub
-    
+
 ErrorHandler:
     MsgBox "Error configuring formats: " & Err.Description, vbCritical, "Error"
 End Sub

@@ -1,12 +1,13 @@
 # LEAN MACRO TOOLS FOR EXCEL MAC
 
-**Version 1.0.3** - 3 Powerful Features via Keyboard Shortcuts & Ribbon Tab
+**Version 1.0.4** - 3 Powerful Features via Keyboard Shortcuts & Ribbon Tab
 
 ## Features
 
 1. **Cycle Number Formats** (Ctrl+Shift+N)
-   - Cycles through: Thousands → Percentage → Multiples → USD → BRL → (wraps back to Thousands)
-   - Customizable format list
+   - Cycles through: Original → Thousands → Percentage → Multiples → USD → BRL → (wraps back to Original)
+   - **NEW:** Returns to cell's original format!
+   - Customizable format list via ribbon button
 
 2. **Trace Precedents** (Ctrl+Shift+T)
    - Shows cells that feed into formulas
@@ -45,11 +46,14 @@ You should see both modules in the left panel.
 
 ```vba
 Private Sub Workbook_Open()
-    Application.OnKey "^+N", "CycleCustomNumberFormats"
-    Application.OnKey "^+T", "TracePrecedentsDialog"
-    Application.OnKey "^+Y", "TraceDependentsDialog"
+    ' Keyboard shortcuts using wrapper functions
+    Application.OnKey "^+N", "CycleFormatsKeyboard"
+    Application.OnKey "^+T", "TracePrecedentsKeyboard"
+    Application.OnKey "^+Y", "TraceDependentsKeyboard"
 End Sub
 ```
+
+**Note:** v1.0.4 uses keyboard wrapper functions to support both ribbon buttons and keyboard shortcuts.
 
 3. **File > Save** (Cmd+S)
 
@@ -63,7 +67,7 @@ End Sub
    **Tip:** Press **Cmd+Shift+G**, paste path above, replace [YourName]
 
 4. **File Format:** **Excel Macro-Enabled Add-In (.xlam)**
-5. **Name:** `LeanMacroTools_v1.0.3`
+5. **Name:** `LeanMacroTools_v1.0.4`
 6. **Save**
 7. Close the workbook
 
@@ -101,13 +105,13 @@ cd /path/to/LeanMacroTool
 
 # For English macOS:
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.3.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.4.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 
 # For localized macOS (Portuguese, etc.):
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.3.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.4.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 ```
@@ -255,14 +259,22 @@ Make sure all 3 files are in the same folder:
 
 ## Version History
 
-### v1.0.3 (Current)
+### v1.0.4 (Current)
+- ✨ **NEW:** Original format tracking - cycling returns to cell's original format!
+- 🐛 **FIXED:** Ribbon buttons now work (fixed callback signatures)
+- 🐛 **FIXED:** Configure button in ribbon functional
+- 🐛 **FIXED:** Format cycling returns to original instead of getting stuck
+- 📝 Cycle order: Original → Thousands → Percentage → Multiples → USD → BRL → Original
+- 📝 Updated Workbook_Open to use keyboard wrapper functions
+
+### v1.0.3
 - ✨ **NEW:** Interactive keyboard navigation for trace dialogs
 - ✨ **NEW:** Dialog stays open for exploring multiple cells
 - ✨ **NEW:** Current cell included in trace list (index 0)
 - ✨ **NEW:** Navigate with +/- or n/p keys through cells automatically
 - 🐛 **FIXED:** Cross-sheet navigation now works correctly
 - 🐛 **FIXED:** macOS path handling in install script
-- 📝 Improved error messages with detailed debugging info
+- 🐛 **FIXED:** Dialog formatting (removed emoji characters)
 
 ### v1.0.2
 - Initial release with basic trace functionality

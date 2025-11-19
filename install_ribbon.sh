@@ -34,7 +34,7 @@ fi
 
 # Try to find the xlam file (check multiple versions)
 XLAM_FILE=""
-for version in "v1.0.3" "v1.0.2" "v1.0.1" ""; do
+for version in "v1.0.4" "v1.0.3" "v1.0.2" "v1.0.1" ""; do
     if [ -z "$version" ]; then
         TEST_FILE="$ADDINS_PATH/LeanMacroTools.xlam"
     else
@@ -55,6 +55,7 @@ if [ -z "$XLAM_FILE" ]; then
     echo "   $ADDINS_PATH"
     echo ""
     echo "Looking for one of:"
+    echo "   - LeanMacroTools_v1.0.4.xlam"
     echo "   - LeanMacroTools_v1.0.3.xlam"
     echo "   - LeanMacroTools_v1.0.2.xlam"
     echo "   - LeanMacroTools.xlam"

@@ -4,8 +4,18 @@ Option Explicit
 ' Enhanced precedent and dependent tracing - Mac optimized
 ' Uses immediate navigation without OK button requirement
 
-' Show precedents dialog
-Public Sub TracePrecedentsDialog()
+' Ribbon callback wrapper for Trace Precedents
+Public Sub TracePrecedentsDialog(Optional control As IRibbonControl = Nothing)
+    TracePrecedentsImpl
+End Sub
+
+' Keyboard shortcut wrapper for Trace Precedents
+Public Sub TracePrecedentsKeyboard()
+    TracePrecedentsImpl
+End Sub
+
+' Implementation: Show precedents dialog
+Private Sub TracePrecedentsImpl()
     On Error GoTo ErrorHandler
 
     Dim activeCell As Range
@@ -43,8 +53,18 @@ ErrorHandler:
     MsgBox "Error tracing precedents: " & Err.Description, vbCritical, "Error"
 End Sub
 
-' Show dependents dialog
-Public Sub TraceDependentsDialog()
+' Ribbon callback wrapper for Trace Dependents
+Public Sub TraceDependentsDialog(Optional control As IRibbonControl = Nothing)
+    TraceDependentsImpl
+End Sub
+
+' Keyboard shortcut wrapper for Trace Dependents
+Public Sub TraceDependentsKeyboard()
+    TraceDependentsImpl
+End Sub
+
+' Implementation: Show dependents dialog
+Private Sub TraceDependentsImpl()
     On Error GoTo ErrorHandler
 
     Dim activeCell As Range
