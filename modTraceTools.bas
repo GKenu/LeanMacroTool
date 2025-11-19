@@ -241,16 +241,17 @@ Public Function GetPrecedents(sourceCell As Range) As Collection
         Next area
     End If
 
-    ' If DirectPrecedents returned nothing or we have a formula, also parse the formula
+    ' Only parse formula if DirectPrecedents returned nothing
     ' This catches cross-sheet references that DirectPrecedents might miss on Mac
-    If sourceCell.HasFormula Then
+    ' and prevents duplication when DirectPrecedents works correctly
+    If result.Count = 0 And sourceCell.HasFormula Then
         Set parsedRefs = ParseFormulaReferences(sourceCell)
 
-        ' Add parsed references that aren't already in the list
+        ' Add parsed references
         Dim ref As Variant
         For Each ref In parsedRefs
             On Error Resume Next
-            result.Add CStr(ref)  ' Will fail silently if duplicate
+            result.Add CStr(ref)
             On Error GoTo ErrorHandler
         Next ref
     End If

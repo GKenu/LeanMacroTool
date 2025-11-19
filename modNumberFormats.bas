@@ -132,29 +132,31 @@ End Sub
 
 ' Load hardcoded number formats
 Public Sub LoadFormats(ByRef formats() As String, ByRef enabled() As Boolean)
-    ' Return hardcoded default formats
-    ReDim formats(1 To 5)
-    ReDim enabled(1 To 5)
+    ' Define all formats in an array (automatically calculates count)
+    Dim allFormats As Variant
+    allFormats = Array( _
+        "#,##0.00_);(#,##0.00);""-""_);@_)", _
+        "0.0%_);(0.0%);""-""_);@_)", _
+        "#,##0.0x_);(#,##0.0)x;""-""_);@_)", _
+        "[$R$-416]#,##0.0_);([$R$-416]#,##0.0);""-""_);@_)", _
+        "[$$-409]#,##0.0_);([$$-409]#,##0.0);""-""_);@_)", _
+        "General" _
+    )
 
-    ' Format 1: Thousands with 2 decimals
-    formats(1) = "#,##0.00_);(#,##0.00);""-""_);@_)"
-    enabled(1) = True
+    ' Calculate format count dynamically
+    Dim formatCount As Integer
+    formatCount = UBound(allFormats) - LBound(allFormats) + 1
 
-    ' Format 2: Percentage
-    formats(2) = "0.0%_);(0.0%);""-""_);@_)"
-    enabled(2) = True
+    ' Size output arrays based on actual format count
+    ReDim formats(1 To formatCount)
+    ReDim enabled(1 To formatCount)
 
-    ' Format 3: Multiple (2.5x)
-    formats(3) = "#,##0.0x_);(#,##0.0)x;""-""_);@_)"
-    enabled(3) = True
-
-    ' Format 4: Brazilian Real
-    formats(4) = "R$#,##0.0_);R$(#,##0.0);""-""_);@_)"
-    enabled(4) = True
-
-    ' Format 5: USD
-    formats(5) = "US$#,##0.0_);US$(#,##0.0);""-""_);@_)"
-    enabled(5) = True
+    ' Copy formats and enable all
+    Dim i As Integer
+    For i = 1 To formatCount
+        formats(i) = allFormats(i - 1)  ' Variant array starts at 0
+        enabled(i) = True
+    Next i
 End Sub
 
 ' ================================================================
