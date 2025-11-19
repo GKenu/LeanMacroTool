@@ -1,43 +1,44 @@
 Attribute VB_Name = "modTraceTools"
 Option Explicit
 
-' Enhanced precedent and dependent tracing with AppleScript dialogs
+' Enhanced precedent and dependent tracing - Mac optimized
+' Uses immediate navigation without OK button requirement
 
 ' Show precedents dialog
 Public Sub TracePrecedentsDialog()
     On Error GoTo ErrorHandler
-    
+
     Dim activeCell As Range
     Dim precedents As Collection
     Dim item As Variant
     Dim i As Integer
     Dim listItems As String
     Dim msg As String
-    
+
     Set activeCell = Application.ActiveCell
-    
+
     If activeCell Is Nothing Then
         MsgBox "No cell selected.", vbExclamation, "Trace Precedents"
         Exit Sub
     End If
-    
+
     If Not activeCell.HasFormula Then
         MsgBox "The selected cell does not contain a formula.", vbInformation, "Trace Precedents"
         Exit Sub
     End If
-    
+
     Set precedents = GetPrecedents(activeCell)
-    
+
     If precedents.Count = 0 Then
         MsgBox "No precedent cells found for " & GetFullAddress(activeCell), vbInformation, "No Precedents"
         Exit Sub
     End If
-    
-    ' Build dialog with AppleScript for better Mac UX
+
+    ' Show dialog with immediate navigation
     Call ShowTraceDialog(activeCell, precedents, True)
-    
+
     Exit Sub
-    
+
 ErrorHandler:
     MsgBox "Error tracing precedents: " & Err.Description, vbCritical, "Error"
 End Sub
@@ -45,111 +46,148 @@ End Sub
 ' Show dependents dialog
 Public Sub TraceDependentsDialog()
     On Error GoTo ErrorHandler
-    
+
     Dim activeCell As Range
     Dim dependents As Collection
-    
+
     Set activeCell = Application.ActiveCell
-    
+
     If activeCell Is Nothing Then
         MsgBox "No cell selected.", vbExclamation, "Trace Dependents"
         Exit Sub
     End If
-    
+
     Set dependents = GetDependents(activeCell)
-    
+
     If dependents.Count = 0 Then
         MsgBox "No dependent cells found for " & GetFullAddress(activeCell), vbInformation, "No Dependents"
         Exit Sub
     End If
-    
+
     Call ShowTraceDialog(activeCell, dependents, False)
-    
+
     Exit Sub
-    
+
 ErrorHandler:
     MsgBox "Error tracing dependents: " & Err.Description, vbCritical, "Error"
 End Sub
 
-' Show trace dialog using AppleScript list picker
+' Show trace dialog with keyboard navigation (stays open, auto-navigates)
 Private Sub ShowTraceDialog(originCell As Range, links As Collection, isPrecedents As Boolean)
     On Error GoTo ErrorHandler
-    
-    Dim asScript As String
-    Dim result As String
-    Dim item As Variant
-    Dim listStr As String
-    Dim title As String
-    Dim msg As String
-    Dim selectedItem As String
-    
-    ' Build title and message
-    If isPrecedents Then
-        title = "Trace Precedents"
-        msg = "Select a precedent cell to jump to:"
-    Else
-        title = "Trace Dependents"
-        msg = "Select a dependent cell to jump to:"
-    End If
-    
-    msg = msg & vbLf & vbLf & "Origin: " & GetFullAddress(originCell)
-    msg = msg & vbLf & "Value: " & GetCellDisplayValue(originCell)
-    If originCell.HasFormula Then
-        msg = msg & vbLf & "Formula: " & originCell.Formula
-    End If
-    msg = msg & vbLf & vbLf & "Linked cells:"
-    
-    ' Build list for AppleScript
-    listStr = ""
-    For Each item In links
-        If listStr <> "" Then listStr = listStr & ", "
-        listStr = listStr & """" & Replace(CStr(item), """", """""") & """"
-    Next item
-    
-    ' AppleScript to show list dialog
-    asScript = "choose from list {" & listStr & "} " & _
-               "with title """ & title & """ " & _
-               "with prompt """ & Replace(msg, """", "\""") & """ " & _
-               "default items {""" & Replace(CStr(links(1)), """", """""") & """}"
-    
-    result = MacScript(asScript)
-    
-    If result <> "false" Then
-        ' User selected something
-        NavigateToCell result
-    End If
-    
-    Exit Sub
-    
-ErrorHandler:
-    ' Fallback to simpler InputBox method
+
     Dim response As String
-    Dim i As Integer
-    
-    msg = "TRACE " & IIf(isPrecedents, "PRECEDENTS", "DEPENDENTS") & vbCrLf & String(50, "=") & vbCrLf & vbCrLf
-    msg = msg & "Origin: " & GetFullAddress(originCell) & vbCrLf
-    msg = msg & "Value: " & GetCellDisplayValue(originCell) & vbCrLf
-    If originCell.HasFormula Then
-        msg = msg & "Formula: " & originCell.Formula & vbCrLf
+    Dim currentIndex As Integer
+    Dim msg As String
+    Dim title As String
+    Dim item As Variant
+    Dim cellNum As Integer
+    Dim instruction As String
+
+    ' Start at first item
+    currentIndex = 0
+
+    ' Build title
+    If isPrecedents Then
+        title = "Trace Precedents Navigator"
+    Else
+        title = "Trace Dependents Navigator"
     End If
-    msg = msg & vbCrLf & "Linked Cells:" & vbCrLf
-    
-    i = 1
-    For Each item In links
-        msg = msg & "  " & i & ". " & item & vbCrLf
-        i = i + 1
-    Next item
-    
-    msg = msg & vbCrLf & "Enter number (1-" & links.Count & "):"
-    
-    response = InputBox(msg, title, "1")
-    
-    If response <> "" And IsNumeric(response) Then
-        i = CInt(response)
-        If i >= 1 And i <= links.Count Then
-            NavigateToCell links(i)
+
+    ' Navigate through list with persistent dialog
+    Do
+        ' Build message showing current position
+        msg = "Origin: " & GetFullAddress(originCell) & vbCrLf
+        If originCell.HasFormula Then
+            msg = msg & "Formula: " & originCell.Formula & vbCrLf
         End If
-    End If
+        msg = msg & vbCrLf & "📍 LINKED CELLS:" & vbCrLf & vbCrLf
+
+        ' Add current cell to list first (index 0)
+        msg = msg & "  0. [CURRENT] " & GetFullAddress(originCell)
+        If currentIndex = 0 Then msg = msg & " ◀"
+        msg = msg & vbCrLf
+
+        ' Show all linked cells
+        Dim i As Integer
+        i = 1
+        For Each item In links
+            msg = msg & "  " & i & ". " & item
+            If i = currentIndex Then msg = msg & " ◀"
+            msg = msg & vbCrLf
+            i = i + 1
+        Next item
+
+        msg = msg & vbCrLf & "━━━━━━━━━━━━━━━━━━━━━" & vbCrLf
+        msg = msg & "⌨️  NAVIGATE:" & vbCrLf
+        msg = msg & "  • Type number (0-" & links.Count & ") + Enter to jump" & vbCrLf
+        msg = msg & "  • Type + or n = Next cell" & vbCrLf
+        msg = msg & "  • Type - or p = Previous cell" & vbCrLf
+        msg = msg & "  • Press ESC or Cancel = Close" & vbCrLf
+
+        ' Show current cell being viewed
+        If currentIndex = 0 Then
+            msg = msg & vbCrLf & "👁️  Viewing: [CURRENT] " & GetFullAddress(originCell)
+        Else
+            msg = msg & vbCrLf & "👁️  Viewing: " & links(currentIndex)
+        End If
+
+        response = InputBox(msg, title, "")
+
+        ' User cancelled - exit
+        If response = "" Then Exit Sub
+
+        ' Parse response
+        response = Trim(LCase(response))
+
+        ' Next cell
+        If response = "+" Or response = "n" Or response = "next" Then
+            currentIndex = currentIndex + 1
+            If currentIndex > links.Count Then currentIndex = 0
+
+            ' Navigate to cell
+            If currentIndex = 0 Then
+                NavigateToCell GetFullAddress(originCell)
+            Else
+                NavigateToCell links(currentIndex)
+            End If
+
+        ' Previous cell
+        ElseIf response = "-" Or response = "p" Or response = "prev" Or response = "previous" Then
+            currentIndex = currentIndex - 1
+            If currentIndex < 0 Then currentIndex = links.Count
+
+            ' Navigate to cell
+            If currentIndex = 0 Then
+                NavigateToCell GetFullAddress(originCell)
+            Else
+                NavigateToCell links(currentIndex)
+            End If
+
+        ' Direct number entry
+        ElseIf IsNumeric(response) Then
+            cellNum = CInt(response)
+            If cellNum >= 0 And cellNum <= links.Count Then
+                currentIndex = cellNum
+
+                ' Navigate to cell
+                If currentIndex = 0 Then
+                    NavigateToCell GetFullAddress(originCell)
+                Else
+                    NavigateToCell links(currentIndex)
+                End If
+            Else
+                MsgBox "Please enter a number between 0 and " & links.Count, vbExclamation, "Invalid Number"
+            End If
+        Else
+            MsgBox "Invalid input. Use number, +, -, n, p, or ESC", vbExclamation, "Invalid Input"
+        End If
+    Loop
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Error showing trace dialog: " & Err.Description, vbCritical, "Error"
 End Sub
 
 ' Get precedents with cross-sheet support
@@ -248,7 +286,7 @@ End Function
 ' Navigate to cell with robust cross-sheet handling
 Public Sub NavigateToCell(fullAddress As String)
     On Error GoTo ErrorHandler
-    
+
     Dim wb As Workbook
     Dim ws As Worksheet
     Dim targetRange As Range
@@ -256,81 +294,110 @@ Public Sub NavigateToCell(fullAddress As String)
     Dim sheetName As String
     Dim cellAddress As String
     Dim pos As Integer
-    
+    Dim tempAddress As String
+
     ' Clean up address
     fullAddress = Trim(fullAddress)
-    
+    tempAddress = fullAddress
+
     ' Parse workbook if present [WorkbookName]
-    If Left(fullAddress, 1) = "[" Then
-        pos = InStr(fullAddress, "]")
+    If Left(tempAddress, 1) = "[" Then
+        pos = InStr(tempAddress, "]")
         If pos > 0 Then
-            workbookName = Mid(fullAddress, 2, pos - 2)
-            fullAddress = Mid(fullAddress, pos + 1)
-            
+            workbookName = Mid(tempAddress, 2, pos - 2)
+            tempAddress = Mid(tempAddress, pos + 1)
+
             ' Find workbook
             On Error Resume Next
             Set wb = Workbooks(workbookName)
             On Error GoTo ErrorHandler
-            
+
             If wb Is Nothing Then
-                MsgBox "Workbook not open: " & workbookName, vbExclamation
+                MsgBox "Workbook not open: " & workbookName, vbExclamation, "Navigation Error"
                 Exit Sub
             End If
         End If
     Else
         Set wb = ActiveWorkbook
     End If
-    
+
     ' Parse sheet!address
-    pos = InStrRev(fullAddress, "!")
+    pos = InStrRev(tempAddress, "!")
     If pos > 0 Then
-        sheetName = Left(fullAddress, pos - 1)
-        cellAddress = Mid(fullAddress, pos + 1)
-        
-        ' Remove quotes
-        sheetName = Replace(sheetName, "'", "")
-        
-        ' Get worksheet
+        sheetName = Left(tempAddress, pos - 1)
+        cellAddress = Mid(tempAddress, pos + 1)
+
+        ' Remove single quotes around sheet name
+        If Left(sheetName, 1) = "'" And Right(sheetName, 1) = "'" Then
+            sheetName = Mid(sheetName, 2, Len(sheetName) - 2)
+        End If
+
+        ' Debug: Log what we're looking for
+        ' MsgBox "Looking for sheet: [" & sheetName & "] in workbook: " & wb.Name
+
+        ' Get worksheet - be more careful with error handling
+        Set ws = Nothing
         On Error Resume Next
         Set ws = wb.Worksheets(sheetName)
-        
+        On Error GoTo 0
+
         If ws Is Nothing Then
-            ' Try by index or name variations
+            ' Try Sheets collection (includes charts, etc.)
+            On Error Resume Next
             Set ws = wb.Sheets(sheetName)
+            On Error GoTo 0
         End If
-        On Error GoTo ErrorHandler
-        
+
         If ws Is Nothing Then
-            MsgBox "Sheet not found: " & sheetName & " in " & wb.Name, vbExclamation
+            MsgBox "Sheet not found: [" & sheetName & "]" & vbCrLf & _
+                   "In workbook: " & wb.Name & vbCrLf & vbCrLf & _
+                   "Full address: " & fullAddress, vbExclamation, "Navigation Error"
             Exit Sub
         End If
-        
+
         ' Get range
+        Set targetRange = Nothing
         On Error Resume Next
         Set targetRange = ws.Range(cellAddress)
-        On Error GoTo ErrorHandler
-        
+        On Error GoTo 0
+
         If targetRange Is Nothing Then
-            MsgBox "Invalid cell address: " & cellAddress, vbExclamation
+            On Error GoTo ErrorHandler
+            MsgBox "Invalid cell address: " & cellAddress & vbCrLf & _
+                   "On sheet: " & sheetName, vbExclamation, "Navigation Error"
             Exit Sub
         End If
-        
-        ' Navigate
+
+        ' Navigate - ensure we activate workbook, then sheet, then select
+        On Error GoTo ErrorHandler
+        Application.ScreenUpdating = False
         wb.Activate
         ws.Activate
         targetRange.Select
         Application.Goto targetRange, True
+        Application.ScreenUpdating = True
     Else
-        ' No sheet specified
-        Set targetRange = Range(fullAddress)
-        Application.Goto targetRange, True
+        ' No sheet specified - use current sheet
+        Set targetRange = Nothing
+        On Error Resume Next
+        Set targetRange = ActiveSheet.Range(fullAddress)
+        On Error GoTo ErrorHandler
+
+        If Not targetRange Is Nothing Then
+            Application.Goto targetRange, True
+        Else
+            MsgBox "Invalid cell address: " & fullAddress, vbExclamation, "Navigation Error"
+        End If
     End If
-    
+
     Exit Sub
-    
+
 ErrorHandler:
+    Application.ScreenUpdating = True
     MsgBox "Could not navigate to: " & fullAddress & vbCrLf & vbCrLf & _
-           "Error: " & Err.Description & " (" & Err.Number & ")", vbExclamation, "Navigation Error"
+           "Error: " & Err.Description & " (" & Err.Number & ")" & vbCrLf & vbCrLf & _
+           "Sheet: [" & sheetName & "]" & vbCrLf & _
+           "Cell: " & cellAddress, vbExclamation, "Navigation Error"
 End Sub
 
 ' Get cell display value
