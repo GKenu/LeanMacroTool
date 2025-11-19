@@ -1,0 +1,96 @@
+Option Explicit
+
+' Module: modHelpers
+' Purpose: Shared utility functions
+
+' Get the display value of a cell (formatted)
+Public Function GetCellDisplayValue(cell As Range) As String
+    On Error GoTo ErrorHandler
+
+    If IsEmpty(cell.Value) Then
+        GetCellDisplayValue = ""
+    ElseIf IsError(cell.Value) Then
+        GetCellDisplayValue = CStr(cell.Value)
+    Else
+        GetCellDisplayValue = cell.Text
+    End If
+
+    Exit Function
+
+ErrorHandler:
+    GetCellDisplayValue = "#ERROR#"
+End Function
+
+' Get the formula of a cell (empty string if no formula)
+Public Function GetCellFormula(cell As Range) As String
+    On Error GoTo ErrorHandler
+
+    If cell.HasFormula Then
+        GetCellFormula = cell.Formula
+    Else
+        GetCellFormula = ""
+    End If
+
+    Exit Function
+
+ErrorHandler:
+    GetCellFormula = ""
+End Function
+
+' Check if a string is a valid cell address
+Public Function IsValidCellAddress(address As String) As Boolean
+    On Error GoTo ErrorHandler
+
+    Dim testRange As Range
+    Set testRange = Range(address)
+    IsValidCellAddress = True
+
+    Exit Function
+
+ErrorHandler:
+    IsValidCellAddress = False
+End Function
+```
+
+---
+
+## USERFORM CODE
+
+### UserForm: frmNumberFormatConfig
+
+**Form Properties:**
+- Name: `frmNumberFormatConfig`
+- Caption: `Configure Number Format Cycle`
+- Width: 480
+- Height: 400
+
+**Controls Layout:**
+```
+┌─────────────────────────────────────────────────────────┐
+│ Configure Number Format Cycle                      [X]  │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│ Current Shortcut: Ctrl+Shift+N                         │
+│                                                         │
+│ Check formats to include in cycle:                     │
+│                                                         │
+│ ☑ Format #1  [#,##0.00_);(#,##0.00);"-"_);@_)    ]    │
+│                                                         │
+│ ☑ Format #2  [0.0%_);(0.0%);"-"_);@_)             ]    │
+│                                                         │
+│ ☑ Format #3  [#,##0.0x_);(#,##0.0)x;"-"_);@_)     ]    │
+│                                                         │
+│ ☑ Format #4  [$#,##0.0_);$(#,##0.0)"x";"-"_);@_)  ]    │
+│                                                         │
+│ ☑ Format #5  [R$#,##0.0_);R$(#,##0.0)"x";"-"_);@_)]    │
+│                                                         │
+│ ☐ Format #6  [                                    ]    │
+│                                                         │
+│ ☐ Format #7  [                                    ]    │
+│                                                         │
+│ ☐ Format #8  [                                    ]    │
+│                                                         │
+│                                                         │
+│         [    OK    ]  [  Cancel  ]  [ Reset Defaults ] │
+│                                                         │
+└─────────────────────────────────────────────────────────┘

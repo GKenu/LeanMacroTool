@@ -1,0 +1,195 @@
+Option Explicit
+
+' Module: modTraceTools
+' Purpose: Enhanced precedent and dependent tracing tools
+
+' Show precedents dialog for active cell
+Public Sub TracePrecedentsDialog()
+    On Error GoTo ErrorHandler
+
+    Dim activeCell As Range
+    Set activeCell = Application.ActiveCell
+
+    If activeCell Is Nothing Then
+        MsgBox "No cell selected.", vbExclamation, "Trace Precedents"
+        Exit Sub
+    End If
+
+    ' Check if cell has a formula
+    If Not activeCell.HasFormula Then
+        MsgBox "The selected cell does not contain a formula.", vbInformation, "Trace Precedents"
+        Exit Sub
+    End If
+
+    ' Show the form in precedents mode
+    frmTraceLinks.ShowTraceDialog activeCell, True
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Error tracing precedents: " & Err.Description, vbCritical, "Error"
+End Sub
+
+' Show dependents dialog for active cell
+Public Sub TraceDependentsDialog()
+    On Error GoTo ErrorHandler
+
+    Dim activeCell As Range
+    Set activeCell = Application.ActiveCell
+
+    If activeCell Is Nothing Then
+        MsgBox "No cell selected.", vbExclamation, "Trace Dependents"
+        Exit Sub
+    End If
+
+    ' Show the form in dependents mode
+    frmTraceLinks.ShowTraceDialog activeCell, False
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Error tracing dependents: " & Err.Description, vbCritical, "Error"
+End Sub
+
+' Get list of precedent cells for a given cell
+Public Function GetPrecedents(sourceCell As Range) As Collection
+    On Error GoTo ErrorHandler
+
+    Dim precedents As Range
+    Dim area As Range
+    Dim cell As Range
+    Dim result As New Collection
+    Dim cellAddress As String
+
+    Set GetPrecedents = result
+
+    ' Get direct precedents
+    On Error Resume Next
+    Set precedents = sourceCell.DirectPrecedents
+    On Error GoTo ErrorHandler
+
+    If precedents Is Nothing Then
+        Exit Function
+    End If
+
+    ' Build collection of precedent addresses
+    For Each area In precedents.Areas
+        For Each cell In area.Cells
+            cellAddress = GetFullAddress(cell)
+            result.Add cellAddress
+        Next cell
+    Next area
+
+    Set GetPrecedents = result
+
+    Exit Function
+
+ErrorHandler:
+    ' Return empty collection on error
+    Set GetPrecedents = New Collection
+End Function
+
+' Get list of dependent cells for a given cell
+Public Function GetDependents(sourceCell As Range) As Collection
+    On Error GoTo ErrorHandler
+
+    Dim dependents As Range
+    Dim area As Range
+    Dim cell As Range
+    Dim result As New Collection
+    Dim cellAddress As String
+
+    Set GetDependents = result
+
+    ' Get direct dependents
+    On Error Resume Next
+    Set dependents = sourceCell.DirectDependents
+    On Error GoTo ErrorHandler
+
+    If dependents Is Nothing Then
+        Exit Function
+    End If
+
+    ' Build collection of dependent addresses
+    For Each area In dependents.Areas
+        For Each cell In area.Cells
+            cellAddress = GetFullAddress(cell)
+            result.Add cellAddress
+        Next cell
+    Next area
+
+    Set GetDependents = result
+
+    Exit Function
+
+ErrorHandler:
+    ' Return empty collection on error
+    Set GetDependents = New Collection
+End Function
+
+' Get full address including sheet name
+Public Function GetFullAddress(cell As Range) As String
+    Dim sheetName As String
+    Dim workbookName As String
+
+    sheetName = cell.Worksheet.Name
+    workbookName = cell.Worksheet.Parent.Name
+
+    ' Add single quotes around sheet name if it contains spaces
+    If InStr(sheetName, " ") > 0 Then
+        sheetName = "'" & sheetName & "'"
+    End If
+
+    ' Include workbook name if not the active workbook
+    If workbookName <> ThisWorkbook.Name And workbookName <> ActiveWorkbook.Name Then
+        GetFullAddress = "[" & workbookName & "]" & sheetName & "!" & cell.Address
+    Else
+        GetFullAddress = sheetName & "!" & cell.Address
+    End If
+End Function
+
+' Navigate to a cell given its full address
+Public Sub NavigateToCell(fullAddress As String)
+    On Error GoTo ErrorHandler
+
+    Dim targetRange As Range
+    Dim sheetName As String
+    Dim cellAddress As String
+    Dim workbookName As String
+    Dim pos As Integer
+    Dim ws As Worksheet
+    Dim wb As Workbook
+
+    ' Parse the address
+    ' Format can be: Sheet1!A1 or 'Sheet 1'!A1 or [Book1]Sheet1!A1
+
+    ' Check for workbook reference
+    If Left(fullAddress, 1) = "[" Then
+        pos = InStr(fullAddress, "]")
+        workbookName = Mid(fullAddress, 2, pos - 2)
+        fullAddress = Mid(fullAddress, pos + 1)
+        Set wb = Workbooks(workbookName)
+    Else
+        Set wb = ActiveWorkbook
+    End If
+
+    ' Split on !
+    pos = InStrRev(fullAddress, "!")
+    If pos > 0 Then
+        sheetName = Left(fullAddress, pos - 1)
+        cellAddress = Mid(fullAddress, pos + 1)
+
+        ' Remove quotes from sheet name
+        sheetName = Replace(sheetName, "'", "")
+
+        Set ws = wb.Sheets(sheetName)
+        Set targetRange = ws.Range(cellAddress)
+
+        Application.Goto targetRange, True
+    End If
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Could not navigate to cell: " & fullAddress & vbCrLf & Err.Description, vbExclamation, "Navigation Error"
+End Sub

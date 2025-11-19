@@ -1,0 +1,206 @@
+Option Explicit
+
+' Module: modNumberFormats
+' Purpose: Cycle through custom number formats and manage configuration
+
+Private Const CONFIG_SHEET_NAME As String = "NumberFormatConfig"
+Private Const MAX_FORMATS As Integer = 10
+
+' Cycle through the configured number formats
+Public Sub CycleCustomNumberFormats()
+    On Error GoTo ErrorHandler
+
+    Dim formats() As String
+    Dim formatEnabled() As Boolean
+    Dim enabledFormats() As String
+    Dim enabledCount As Integer
+    Dim i As Integer, j As Integer
+    Dim currentFormat As String
+    Dim nextIndex As Integer
+    Dim targetRange As Range
+
+    ' Load formats from configuration
+    LoadFormats formats, formatEnabled
+
+    ' Build array of only enabled formats
+    enabledCount = 0
+    For i = LBound(formatEnabled) To UBound(formatEnabled)
+        If formatEnabled(i) Then enabledCount = enabledCount + 1
+    Next i
+
+    If enabledCount = 0 Then
+        MsgBox "No number formats are enabled. Please configure formats first.", vbExclamation, "No Formats"
+        Exit Sub
+    End If
+
+    ReDim enabledFormats(1 To enabledCount)
+    j = 1
+    For i = LBound(formats) To UBound(formats)
+        If formatEnabled(i) Then
+            enabledFormats(j) = formats(i)
+            j = j + 1
+        End If
+    Next i
+
+    ' Get current selection
+    Set targetRange = Selection
+    If targetRange Is Nothing Then Exit Sub
+
+    ' Get current format of active cell
+    currentFormat = targetRange.Cells(1, 1).NumberFormat
+
+    ' Find current format in enabled list and move to next
+    nextIndex = 1 ' Default to first format
+    For i = LBound(enabledFormats) To UBound(enabledFormats)
+        If currentFormat = enabledFormats(i) Then
+            nextIndex = i + 1
+            If nextIndex > UBound(enabledFormats) Then nextIndex = LBound(enabledFormats)
+            Exit For
+        End If
+    Next i
+
+    ' Apply the next format to entire selection
+    targetRange.NumberFormat = enabledFormats(nextIndex)
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Error cycling number formats: " & Err.Description, vbCritical, "Error"
+End Sub
+
+' Open the number format configuration dialog
+Public Sub ConfigureNumberFormats()
+    frmNumberFormatConfig.Show
+End Sub
+
+' Load formats from hidden config sheet
+Public Sub LoadFormats(ByRef formats() As String, ByRef enabled() As Boolean)
+    On Error GoTo ErrorHandler
+
+    Dim ws As Worksheet
+    Dim wb As Workbook
+    Dim i As Integer
+    Dim lastRow As Long
+
+    Set wb = ThisWorkbook
+
+    ' Check if config sheet exists
+    On Error Resume Next
+    Set ws = wb.Sheets(CONFIG_SHEET_NAME)
+    On Error GoTo ErrorHandler
+
+    If ws Is Nothing Then
+        ' Create default configuration
+        CreateDefaultConfig
+        Set ws = wb.Sheets(CONFIG_SHEET_NAME)
+    End If
+
+    ' Read formats from sheet
+    lastRow = ws.Cells(ws.Rows.Count, 1).End(xlUp).Row
+    If lastRow < 2 Then lastRow = 6 ' At least 5 formats
+
+    ReDim formats(1 To lastRow - 1)
+    ReDim enabled(1 To lastRow - 1)
+
+    For i = 2 To lastRow
+        formats(i - 1) = ws.Cells(i, 1).Value
+        enabled(i - 1) = (ws.Cells(i, 2).Value = "TRUE" Or ws.Cells(i, 2).Value = True)
+    Next i
+
+    Exit Sub
+
+ErrorHandler:
+    ' Return default formats if error
+    ReDim formats(1 To 5)
+    ReDim enabled(1 To 5)
+    formats(1) = "#,##0.00_);(#,##0.00);""-""_);@_)"
+    formats(2) = "0.0%_);(0.0%);""-""_);@_)"
+    formats(3) = "#,##0.0x_);(#,##0.0)x;""-""_);@_)"
+    formats(4) = "$#,##0.0_);$(#,##0.0)""x"";""-""_);@_)"
+    formats(5) = "R$#,##0.0_);R$(#,##0.0)""x"";""-""_);@_)"
+    For i = 1 To 5
+        enabled(i) = True
+    Next i
+End Sub
+
+' Save formats to hidden config sheet
+Public Sub SaveFormats(formats() As String, enabled() As Boolean)
+    On Error GoTo ErrorHandler
+
+    Dim ws As Worksheet
+    Dim wb As Workbook
+    Dim i As Integer
+
+    Set wb = ThisWorkbook
+
+    ' Get or create config sheet
+    On Error Resume Next
+    Set ws = wb.Sheets(CONFIG_SHEET_NAME)
+    On Error GoTo ErrorHandler
+
+    If ws Is Nothing Then
+        Set ws = wb.Sheets.Add
+        ws.Name = CONFIG_SHEET_NAME
+    End If
+
+    ' Clear existing data
+    ws.Cells.Clear
+
+    ' Write headers
+    ws.Cells(1, 1).Value = "Format"
+    ws.Cells(1, 2).Value = "Enabled"
+
+    ' Write formats
+    For i = LBound(formats) To UBound(formats)
+        ws.Cells(i + 1, 1).Value = formats(i)
+        ws.Cells(i + 1, 2).Value = enabled(i)
+    Next i
+
+    ' Hide the sheet
+    ws.Visible = xlSheetVeryHidden
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Error saving format configuration: " & Err.Description, vbCritical, "Error"
+End Sub
+
+' Create default configuration sheet
+Private Sub CreateDefaultConfig()
+    On Error GoTo ErrorHandler
+
+    Dim ws As Worksheet
+    Dim wb As Workbook
+
+    Set wb = ThisWorkbook
+    Set ws = wb.Sheets.Add
+    ws.Name = CONFIG_SHEET_NAME
+
+    ' Headers
+    ws.Cells(1, 1).Value = "Format"
+    ws.Cells(1, 2).Value = "Enabled"
+
+    ' Default formats (your 5 specified formats)
+    ws.Cells(2, 1).Value = "#,##0.00_);(#,##0.00);""-""_);@_)"
+    ws.Cells(2, 2).Value = True
+
+    ws.Cells(3, 1).Value = "0.0%_);(0.0%);""-""_);@_)"
+    ws.Cells(3, 2).Value = True
+
+    ws.Cells(4, 1).Value = "#,##0.0x_);(#,##0.0)x;""-""_);@_)"
+    ws.Cells(4, 2).Value = True
+
+    ws.Cells(5, 1).Value = "$#,##0.0_);$(#,##0.0)""x"";""-""_);@_)"
+    ws.Cells(5, 2).Value = True
+
+    ws.Cells(6, 1).Value = "R$#,##0.0_);R$(#,##0.0)""x"";""-""_);@_)"
+    ws.Cells(6, 2).Value = True
+
+    ' Hide the sheet
+    ws.Visible = xlSheetVeryHidden
+
+    Exit Sub
+
+ErrorHandler:
+    MsgBox "Error creating default configuration: " & Err.Description, vbCritical, "Error"
+End Sub
