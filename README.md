@@ -1,6 +1,6 @@
 # LEAN MACRO TOOLS FOR EXCEL MAC
 
-**Version 1.0.4** - 3 Powerful Features via Keyboard Shortcuts & Ribbon Tab
+**Version 1.0.5** - 4 Powerful Features via Keyboard Shortcuts & Ribbon Tab
 
 I missed TTS Macros for personal use, so I built my own. Not perfect yet, but feel free to use and contribute!
 
@@ -8,17 +8,23 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
 
 1. **Cycle Number Formats** (Ctrl+Shift+N)
    - Cycles through: Original → Thousands → Percentage → Multiples → USD → BRL → (wraps back to Original)
-   - **NEW:** Returns to cell's original format!
+   - Returns to cell's original format!
    - Customizable format list via ribbon button
 
-2. **Trace Precedents** (Ctrl+Shift+T)
+2. **Cycle Font Colors** (Ctrl+Shift+V) **NEW in v1.0.5**
+   - Cycles through preset colors: Blue → Green → Red → Grey → Black → Original
+   - Changes text color (not background)
+   - Remembers and restores original font color
+   - Perfect for highlighting important cells!
+
+3. **Trace Precedents** (Ctrl+Shift+T)
    - Shows cells that feed into formulas
    - **Interactive keyboard navigation** - use +/- or n/p to navigate through list automatically!
    - Includes current cell in the list (index 0)
    - Dialog stays open for exploring multiple cells
    - Works cross-sheet perfectly
 
-3. **Trace Dependents** (Ctrl+Shift+Y)
+4. **Trace Dependents** (Ctrl+Shift+Y)
    - Shows cells that use the current cell
    - **Interactive keyboard navigation** - navigate through list with +/- keys!
    - Includes current cell in the list
@@ -37,25 +43,37 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
 
 **Step 2: Import VBA Modules**
 1. Press **Option+F11** (VBA Editor)
-2. **File > Import File...** → Select **modNumberFormats.bas** → Open
-3. **File > Import File...** → Select **modTraceTools.bas** → Open
+2. **File > Import File...** (or **Option+Cmd+I**) → Select **modNumberFormats.bas** → Open
+3. **File > Import File...** (or **Option+Cmd+I**) → Select **modColorFormats.bas** → Open
+4. **File > Import File...** (or **Option+Cmd+I**) → Select **modTraceTools.bas** → Open
 
-You should see both modules in the left panel.
+You should see all three modules in the left panel.
 
-**Step 3: Add Ribbon Callback**
+**Step 3: Add Keyboard Shortcuts**
 1. In VBA Editor, double-click **ThisWorkbook** (left panel)
 2. Paste this code:
 
 ```vba
 Private Sub Workbook_Open()
-    ' Keyboard shortcuts using wrapper functions
+    ' Register keyboard shortcuts for macro functions
+    ' Syntax: Application.OnKey "^+[Key]", "[MacroName]"
+    ' Where ^ = Ctrl, + = Shift
+
+    ' Number Format Cycling (Ctrl+Shift+N)
     Application.OnKey "^+N", "CycleFormatsKeyboard"
+
+    ' Font Color Cycling (Ctrl+Shift+V) - NEW in v1.0.5
+    Application.OnKey "^+V", "CycleColorsKeyboard"
+
+    ' Trace Precedents (Ctrl+Shift+T)
     Application.OnKey "^+T", "TracePrecedentsKeyboard"
+
+    ' Trace Dependents (Ctrl+Shift+Y)
     Application.OnKey "^+Y", "TraceDependentsKeyboard"
 End Sub
 ```
 
-**Note:** v1.0.4 uses keyboard wrapper functions to support both ribbon buttons and keyboard shortcuts.
+**Note:** The add-in uses keyboard wrapper functions to support both ribbon buttons and keyboard shortcuts.
 
 3. **File > Save** (Cmd+S)
 
@@ -69,7 +87,7 @@ End Sub
    **Tip:** Press **Cmd+Shift+G**, paste path above, replace [YourName]
 
 4. **File Format:** **Excel Macro-Enabled Add-In (.xlam)**
-5. **Name:** `LeanMacroTools_v1.0.4`
+5. **Name:** `LeanMacroTools_v1.0.5`
 6. **Save**
 7. Close the workbook
 
@@ -98,7 +116,7 @@ cd /path/to/LeanMacroTool  # Or wherever you saved the files
 
 The script will automatically:
 - Detect your Add-ins folder (even if localized like `Add-Ins.localized`)
-- Find your .xlam file (searches for v1.0.3, v1.0.2, or v1.0.1)
+- Find your .xlam file (searches for v1.0.5, v1.0.4, v1.0.3, etc.)
 - Inject the ribbon XML
 
 **Manual way (if needed):**
@@ -107,13 +125,13 @@ cd /path/to/LeanMacroTool
 
 # For English macOS:
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.4.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.5.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 
 # For localized macOS (Portuguese, etc.):
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.4.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.5.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 ```
@@ -145,13 +163,14 @@ find ~/Library -name "Add-*ns*" -type d 2>/dev/null | grep Office
 
 Click the **"Lean Macros"** tab, then click any button:
 - **Cycle Formats** - Change number format
-- **Configure** - Customize formats
+- **Cycle Colors** - Change font color
 - **Trace Precedents** - See formula inputs
 - **Trace Dependents** - See what uses this cell
 
 ### Via Keyboard (Faster!)
 
 - **Ctrl+Shift+N** - Cycle formats
+- **Ctrl+Shift+V** - Cycle font colors
 - **Ctrl+Shift+T** - Trace precedents (opens navigator dialog)
 - **Ctrl+Shift+Y** - Trace dependents (opens navigator dialog)
 
@@ -243,14 +262,16 @@ Make sure all 3 files are in the same folder:
 ## Files Included
 
 1. **modNumberFormats.bas** - Number formatting code
-2. **modTraceTools.bas** - Tracing code with keyboard navigation
-3. **customUI14.xml** - Ribbon tab definition
-4. **_rels_dot_rels_for_customUI.xml** - Ribbon relationships
-5. **inject_ribbon.py** - Script to add ribbon to .xlam
-6. **install_ribbon.sh** - Automated installer script (macOS)
-7. **README.md** - This file
-8. **CHANGELOG.md** - Version history
-9. **LICENSE** - MIT License
+2. **modColorFormats.bas** - Font color cycling code
+3. **modTraceTools.bas** - Tracing code with keyboard navigation
+4. **customUI14.xml** - Ribbon tab definition
+5. **_rels_dot_rels_for_customUI.xml** - Ribbon relationships
+6. **inject_ribbon.py** - Script to add ribbon to .xlam
+7. **install_ribbon.sh** - Automated installer script (macOS)
+8. **ThisWorkbook_KeyboardShortcuts.txt** - Keyboard shortcut registration guide
+9. **README.md** - This file
+10. **CHANGELOG.md** - Version history
+11. **LICENSE** - MIT License
 
 ---
 
@@ -263,9 +284,51 @@ Make sure all 3 files are in the same folder:
 
 ---
 
+## Tips for Additional Useful Shortcuts
+
+While this add-in provides custom macros, Excel for Mac also lets you customize keyboard shortcuts for built-in commands. Here are some recommended shortcuts that complement the add-in features:
+
+### How to Set Up Custom Shortcuts
+
+1. Go to **Tools > Customize Keyboard...**
+2. In the **Categories** list, select **Home Tab**
+3. Search for and add shortcuts for these useful commands:
+
+### Recommended Shortcuts
+
+| Command | Suggested Shortcut | Description |
+|---------|-------------------|-------------|
+| **Increase Indent** | Ctrl+Shift+] | Move content farther from cell border |
+| **Decrease Indent** | Ctrl+Shift+[ | Move content closer to cell border |
+| **Increase Decimal** | Ctrl+Shift++ | Show more decimal places |
+| **Decrease Decimal** | Ctrl+Shift+. | Show fewer decimal places |
+
+### Setup Instructions
+
+**For Indent Controls:**
+1. In Customize Keyboard, search for "inde"
+2. Select **Increase Indent** → Press **Ctrl+Shift+]** → Click **Add**
+3. Select **Decrease Indent** → Press **Ctrl+Shift+[** → Click **Add**
+
+**For Decimal Controls:**
+1. Search for "dec"
+2. Select **Increase Decimal** → Press **Ctrl+Shift++** → Click **Add**
+3. Select **Decrease Decimal** → Press **Ctrl+Shift+.** → Click **Add**
+
+**Note:** These shortcuts are Excel native features and work independently of the LeanMacroTools add-in.
+
+---
+
 ## Version History
 
-### v1.0.4 (Current)
+### v1.0.5 (Current)
+- ✨ **NEW:** Font color cycling feature (Ctrl+Shift+V)
+- ✨ Cycles through: Blue → Green → Red → Black → Original
+- ✨ Remembers and restores original font color for each cell
+- 📝 Added Cycle Colors ribbon button
+- 📝 Supports both keyboard shortcut and ribbon button
+
+### v1.0.4
 - ✨ **NEW:** Original format tracking - cycling returns to cell's original format!
 - 🐛 **FIXED:** Ribbon buttons now work (fixed callback signatures)
 - 🐛 **FIXED:** Configure button in ribbon functional

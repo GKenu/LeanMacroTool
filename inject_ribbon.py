@@ -101,9 +101,14 @@ def inject_ribbon(xlam_path, customui_xml_path, rels_xml_path):
                     zipf.write(file_path, arcname)
         
         print(f"✓ Successfully injected ribbon into {xlam_path}")
-        print("\n✅ Done! Your .xlam now has a 'Lean Macros' ribbon tab!")
-        print("   Reopen Excel to see it.")
-        
+
+        # Remove backup after successful injection
+        if os.path.exists(backup_path):
+            os.remove(backup_path)
+            print("✓ Cleaned up backup file")
+
+        print("\n✅ Success! Please restart Excel to see the Lean Macros tab.")
+
         return True
         
     except Exception as e:

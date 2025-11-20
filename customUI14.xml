@@ -11,6 +11,13 @@
                   onAction="CycleCustomNumberFormats"
                   screentip="Cycle Number Formats"
                   supertip="Cycle through custom number formats. Shortcut: Ctrl+Shift+N"/>
+          <button id="btnCycleColors"
+                  label="Cycle Colors"
+                  size="large"
+                  imageMso="FontColor"
+                  onAction="CycleCustomColors"
+                  screentip="Cycle Font Colors"
+                  supertip="Cycle through preset font colors: Blue → Green → Red → Grey → Black → Original. Shortcut: Ctrl+Shift+V"/>
         </group>
         <group id="grpTracing" label="Formula Tracing">
           <button id="btnTracePrecedents" 
