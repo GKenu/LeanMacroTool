@@ -5,6 +5,32 @@ All notable changes to LeanMacroTool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2025-01-20
+
+### Added
+- **Font Color Cycling Feature** - New color cycling functionality with Ctrl+Shift+V keyboard shortcut
+- `modColorFormats.bas` module for font color management
+- Cycle through preset colors: Blue → Green → Red → Grey → Black → Original (6 colors)
+- Original font color tracking and restoration (per-cell memory)
+- Cycle Colors button in ribbon UI (Number Formatting group)
+- Support for both ribbon button and keyboard shortcut (Ctrl+Shift+V)
+- `CycleColorsKeyboard()` wrapper function for keyboard shortcut compatibility
+- `ThisWorkbook_KeyboardShortcuts.txt` documentation file
+
+### Changed
+- Updated ribbon UI to include Cycle Colors button with FontColor icon
+- Enhanced keyboard shortcut registration documentation
+- Updated README.md with color cycling feature and usage instructions
+- Installation instructions now include modColorFormats.bas import step
+
+### Technical Details
+- Color cycling uses same architecture pattern as number format cycling
+- Module-level variables track original cell address and font color
+- Uses `Selection.Font.Color` property with RGB values
+- Index-based cycling ensures reliable color transitions
+- Works on entire selection (multi-cell support)
+- Resets cycle when moving to different cell
+
 ## [1.0.4] - 2025-01-18
 
 ### Added
@@ -121,4 +147,4 @@ We use [Semantic Versioning](https://semver.org/):
 - **MINOR** version: New functionality (backwards-compatible)
 - **PATCH** version: Bug fixes (backwards-compatible)
 
-Current version: **1.0.3**
+Current version: **1.0.5**

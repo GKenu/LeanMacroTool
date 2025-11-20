@@ -1,0 +1,38 @@
+================================================================
+ThisWorkbook Module - Keyboard Shortcut Registration
+================================================================
+
+NOTE: This code must be added to the ThisWorkbook module inside the
+LeanMacroTools.xlam file. The ThisWorkbook module is accessed by
+opening the VBA Editor in Excel (Alt+F11) when the add-in is open.
+
+Add this code to the ThisWorkbook module:
+
+----------------------------------------------------------------
+
+Private Sub Workbook_Open()
+    ' Register keyboard shortcuts for macro functions
+    ' Syntax: Application.OnKey "^+[Key]", "[MacroName]"
+    ' Where ^ = Ctrl, + = Shift
+
+    ' Number Format Cycling (Ctrl+Shift+N)
+    Application.OnKey "^+N", "CycleFormatsKeyboard"
+
+    ' Font Color Cycling (Ctrl+Shift+V) - NEW in v1.0.5
+    Application.OnKey "^+V", "CycleColorsKeyboard"
+
+    ' Trace Precedents (Ctrl+Shift+T)
+    Application.OnKey "^+T", "TracePrecedentsKeyboard"
+
+    ' Trace Dependents (Ctrl+Shift+Y)
+    Application.OnKey "^+Y", "TraceDependentsKeyboard"
+End Sub
+
+----------------------------------------------------------------
+
+IMPORTANT: After adding this code to ThisWorkbook:
+1. Save the 'LeanMacroTools_v1.0.5.xlam' file on folder "/Users/[YourName]/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/"
+2. Close and reopen Excel to register the shortcuts
+3. Test the shortcuts by pressing Ctrl+Shift+V in any cell
+
+================================================================
