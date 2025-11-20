@@ -18,6 +18,13 @@
                   onAction="CycleCustomColors"
                   screentip="Cycle Font Colors"
                   supertip="Cycle through preset font colors: Blue → Green → Red → Grey → Black → Original. Shortcut: Ctrl+Shift+V"/>
+          <button id="btnCycleFill"
+                  label="Cycle Fill"
+                  size="large"
+                  imageMso="CellFillColorPicker"
+                  onAction="CycleFillFormats"
+                  screentip="Cycle Fill Patterns"
+                  supertip="Cycle through fill patterns: Color+Border → Pattern → Original. Shortcut: Ctrl+Shift+B"/>
         </group>
         <group id="grpTracing" label="Formula Tracing">
           <button id="btnTracePrecedents" 

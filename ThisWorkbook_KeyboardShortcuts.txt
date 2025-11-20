@@ -21,6 +21,9 @@ Private Sub Workbook_Open()
     ' Font Color Cycling (Ctrl+Shift+V) - NEW in v1.0.5
     Application.OnKey "^+V", "CycleColorsKeyboard"
 
+    ' Fill Pattern Cycling (Ctrl+Shift+B) - NEW in v1.0.6
+    Application.OnKey "^+B", "CycleFillKeyboard"
+
     ' Trace Precedents (Ctrl+Shift+T)
     Application.OnKey "^+T", "TracePrecedentsKeyboard"
 
@@ -31,8 +34,13 @@ End Sub
 ----------------------------------------------------------------
 
 IMPORTANT: After adding this code to ThisWorkbook:
-1. Save the 'LeanMacroTools_v1.0.5.xlam' file on folder "/Users/[YourName]/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/"
+1. Save the 'LeanMacroTools_v1.0.6.xlam' file on folder "/Users/[YourName]/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/"
 2. Close and reopen Excel to register the shortcuts
-3. Test the shortcuts by pressing Ctrl+Shift+V in any cell
+3. Test the shortcuts:
+   - Ctrl+Shift+N (cycle number formats)
+   - Ctrl+Shift+V (cycle font colors)
+   - Ctrl+Shift+B (cycle fill patterns)
+   - Ctrl+Shift+T (trace precedents)
+   - Ctrl+Shift+Y (trace dependents)
 
 ================================================================

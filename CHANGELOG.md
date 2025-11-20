@@ -5,6 +5,35 @@ All notable changes to LeanMacroTool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-01-20
+
+### Added
+- **Fill Pattern Cycling Feature** - New fill/border cycling functionality with Ctrl+Shift+B keyboard shortcut
+- `modFillFormats.bas` module for fill pattern and border management
+- Cycle through formats: Color+Border → Pattern → Original (3 states)
+- First format: Beige background (RGB 255, 242, 204) with outline border
+- Second format: Fine dots pattern (xlGray8 - 6.25% pattern)
+- Original format tracking and restoration (per-cell memory)
+- Cycle Fill button in ribbon UI (Number Formatting group)
+- Support for both ribbon button and keyboard shortcut (Ctrl+Shift+B)
+- `CycleFillKeyboard()` wrapper function for keyboard shortcut compatibility
+
+### Changed
+- Updated ribbon UI to include Cycle Fill button with CellFillColorPicker icon
+- Updated README.md with fill cycling feature and usage instructions
+- Updated ThisWorkbook_KeyboardShortcuts.txt with Ctrl+Shift+B shortcut
+- Installation instructions now include modFillFormats.bas import step
+- Version references updated from v1.0.5 to v1.0.6
+
+### Technical Details
+- Fill cycling uses same architecture pattern as number/color format cycling
+- Module-level variables track original cell address, fill color, pattern, and border state
+- Uses `Selection.Interior` property for fill and `BorderAround` for borders
+- Stores original fill properties (Color, Pattern, PatternColor) for restoration
+- Works on entire selection (multi-cell support)
+- Resets cycle when moving to different cell
+- `HasBorders()` helper function checks if cell has any borders
+
 ## [1.0.5] - 2025-01-20
 
 ### Added
@@ -147,4 +176,4 @@ We use [Semantic Versioning](https://semver.org/):
 - **MINOR** version: New functionality (backwards-compatible)
 - **PATCH** version: Bug fixes (backwards-compatible)
 
-Current version: **1.0.5**
+Current version: **1.0.6**
