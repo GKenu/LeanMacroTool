@@ -1,6 +1,6 @@
 # LEAN MACRO TOOLS FOR EXCEL MAC
 
-**Version 1.0.6** - 5 Powerful Features via Keyboard Shortcuts & Ribbon Tab
+**Version 1.0.7** - 5 Powerful Features via Keyboard Shortcuts & Ribbon Tab
 
 I missed TTS Macros for personal use, so I built my own. Not perfect yet, but feel free to use and contribute!
 
@@ -42,7 +42,33 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
 
 ## Installation
 
-### Part 1: Create the Add-In (5 minutes)
+### Quick Install (2 minutes) ⚡
+
+**Step 1: Download and Extract**
+1. Download the latest release: `LeanMacroTools_v1.0.7.zip`
+2. Double-click to extract the zip file
+
+**Step 2: Run Installer**
+1. Double-click **install.command** in the extracted folder
+2. The installer will automatically find your Excel Add-ins folder
+3. Follow the on-screen instructions
+
+**Step 3: Enable in Excel**
+1. Open Excel
+2. Go to **Tools > Excel Add-ins...**
+3. Check ☑ **LeanMacroTools_v1.0.7**
+4. Click **OK**
+
+**That's it!** You should see a "Lean Macros" tab in the ribbon with all features ready to use.
+
+---
+
+### Advanced: Manual Installation
+
+<details>
+<summary>Click to expand manual installation instructions</summary>
+
+#### Part 1: Create the Add-In (5 minutes)
 
 **Step 1: Create New Workbook**
 1. Open Excel
@@ -73,7 +99,7 @@ Private Sub Workbook_Open()
     ' Font Color Cycling (Ctrl+Shift+V)
     Application.OnKey "^+V", "CycleColorsKeyboard"
 
-    ' Fill Pattern Cycling (Ctrl+Shift+B) - NEW in v1.0.6
+    ' Fill Pattern Cycling (Ctrl+Shift+B)
     Application.OnKey "^+B", "CycleFillKeyboard"
 
     ' Trace Precedents (Ctrl+Shift+T)
@@ -98,13 +124,11 @@ End Sub
    **Tip:** Press **Cmd+Shift+G**, paste path above, replace [YourName]
 
 4. **File Format:** **Excel Macro-Enabled Add-In (.xlam)**
-5. **Name:** `LeanMacroTools_v1.0.6`
+5. **Name:** `LeanMacroTools_v1.0.7`
 6. **Save**
 7. Close the workbook
 
----
-
-### Part 2: Add Ribbon Tab (3 minutes)
+#### Part 2: Add Ribbon Tab (3 minutes)
 
 This adds a "Lean Macros" tab to Excel with buttons for all features.
 
@@ -127,7 +151,7 @@ cd /path/to/LeanMacroTool  # Or wherever you saved the files
 
 The script will automatically:
 - Detect your Add-ins folder (even if localized like `Add-Ins.localized`)
-- Find your .xlam file (searches for v1.0.6, v1.0.5, v1.0.4, etc.)
+- Find your .xlam file (searches for v1.0.7, v1.0.6, v1.0.5, etc.)
 - Inject the ribbon XML
 
 **Manual way (if needed):**
@@ -136,13 +160,13 @@ cd /path/to/LeanMacroTool
 
 # For English macOS:
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.6.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.7.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 
 # For localized macOS (Portuguese, etc.):
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.6.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.7.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 ```
@@ -158,13 +182,13 @@ find ~/Library -name "Add-*ns*" -type d 2>/dev/null | grep Office
 - Reopen Excel
 - You should see a **"Lean Macros"** tab in the ribbon!
 
----
-
-### Part 3: Enable the Add-In
+#### Part 3: Enable the Add-In
 
 1. In Excel: **Tools > Excel Add-ins...**
 2. Check ☑ **LeanMacroTools**
 3. Click **OK**
+
+</details>
 
 ---
 
@@ -201,6 +225,50 @@ When you open the Trace Precedents/Dependents dialog:
 - Press **ESC** or **Cancel** - Close dialog
 
 The dialog stays open so you can explore multiple cells without reopening it!
+
+---
+
+## For Developers
+
+### Building and Releasing
+
+The project uses a template-based build system for easy development and distribution.
+
+**Quick Start:**
+```bash
+./scripts/build_release.sh
+```
+
+This automatically:
+1. Copies `templates/LeanMacroTools_template.xlam`
+2. Injects ribbon UI
+3. Creates distribution package in `dist/`
+4. Generates `.zip` file ready for GitHub Releases
+
+**When You Update Code:**
+
+1. **Edit VBA modules** in `src/*.bas` files
+2. **Update the template:**
+   - Open `templates/LeanMacroTools_template.xlam` in Excel
+   - Press Option+F11 (VBA Editor)
+   - Re-import the changed module(s)
+   - Save and close
+3. **Build release:** `./scripts/build_release.sh`
+
+**Development Scripts:**
+- `scripts/build_release.sh` - Build complete distribution package
+- `scripts/install_ribbon.sh` - Inject ribbon into existing .xlam (for manual testing)
+- `install.command` - End-user installer (in distribution package)
+
+**Repository Structure:**
+```
+LeanMacroTool/
+├── src/                    # VBA source modules (.bas files)
+├── ribbon/                 # Ribbon UI definition files
+├── scripts/                # Build and installation scripts
+├── templates/              # Template .xlam with VBA modules
+└── install.command         # User-facing installer
+```
 
 ---
 
@@ -274,6 +342,14 @@ Make sure all 3 files are in the same folder:
 
 ## Files Included
 
+### For Users (in distribution package):
+1. **LeanMacroTools_v1.0.7.xlam** - Pre-built add-in with ribbon UI embedded
+2. **install.command** - Double-click installer (auto-detects Add-ins folder)
+3. **README.md** - This file
+4. **CHANGELOG.md** - Version history
+5. **LICENSE** - MIT License
+
+### For Developers (in source repository):
 1. **modNumberFormats.bas** - Number formatting code
 2. **modColorFormats.bas** - Font color cycling code
 3. **modFillFormats.bas** - Fill pattern and border cycling code
@@ -281,11 +357,9 @@ Make sure all 3 files are in the same folder:
 5. **customUI14.xml** - Ribbon tab definition
 6. **_rels_dot_rels_for_customUI.xml** - Ribbon relationships
 7. **inject_ribbon.py** - Script to add ribbon to .xlam
-8. **install_ribbon.sh** - Automated installer script (macOS)
-9. **ThisWorkbook_KeyboardShortcuts.txt** - Keyboard shortcut registration guide
-10. **README.md** - This file
-11. **CHANGELOG.md** - Version history
-12. **LICENSE** - MIT License
+8. **install_ribbon.sh** - Manual ribbon installer (for development)
+9. **build_release.sh** - Creates distribution packages
+10. **ThisWorkbook_KeyboardShortcuts.txt** - Keyboard shortcut registration guide
 
 ---
 
@@ -293,8 +367,9 @@ Make sure all 3 files are in the same folder:
 
 - macOS 12+ (Monterey or newer)
 - Excel for Mac 16.x
-- Python 3 (for ribbon injection)
 - Macros enabled in Excel
+
+**Note:** Python is NOT required for users! The pre-built .xlam already includes the ribbon UI. Python is only needed for developers building new releases.
 
 ---
 
@@ -335,7 +410,17 @@ While this add-in provides custom macros, Excel for Mac also lets you customize 
 
 ## Version History
 
-### v1.0.6 (Current)
+### v1.0.7 (Current)
+- ✨ **NEW:** Simplified installation process! Now just 2 steps
+- ✨ **NEW:** install.command - Double-click installer script
+- ✨ **NEW:** build_release.sh - Creates distribution packages
+- ✨ Auto-detects Add-ins folder (handles localized paths)
+- ✨ Pre-built .xlam with ribbon UI already embedded
+- 📝 No Python required for users anymore!
+- 📝 Manual installation moved to "Advanced" section
+- 📝 Updated documentation for simpler workflow
+
+### v1.0.6
 - ✨ **NEW:** Fill pattern cycling feature (Ctrl+Shift+B)
 - ✨ Cycles through: Color+Border → Pattern → Original
 - ✨ First format: Beige background with outline border

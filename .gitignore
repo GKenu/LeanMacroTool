@@ -34,3 +34,7 @@ Temporary Items
 # VBA export temp files
 *.frx
 *.log
+
+# Distribution files
+dist/
+*.zip
