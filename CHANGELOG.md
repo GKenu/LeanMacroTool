@@ -5,6 +5,40 @@ All notable changes to LeanMacroTool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2025-01-20
+
+### Added
+- **Simplified Installation System** - Reduced installation from 6 complex steps to 2 simple steps
+- `install.command` - Double-click installer script with automatic Add-ins folder detection
+- `build_release.sh` - Automated release package builder for developers
+- **Template-based build system** - Uses `templates/LeanMacroTools_template.xlam` for consistent builds
+- `templates/` folder with template .xlam and documentation
+- Auto-detection of Add-ins folder (handles both English and localized folder names)
+- Pre-built distribution packages with ribbon UI already embedded
+- Distribution folder structure with all necessary files for users
+- "For Developers" section in README with build workflow documentation
+
+### Changed
+- **Major UX Improvement:** Users no longer need Python, VBA Editor, or manual ribbon injection
+- **Major Dev Improvement:** Template-based builds - just run `./scripts/build_release.sh`
+- Installation process now: Download → Double-click install.command → Enable in Excel
+- README.md restructured with "Quick Install" as primary method
+- Manual installation moved to collapsible "Advanced" section
+- System Requirements updated to clarify Python not needed for users
+- Files list now separated into "For Users" and "For Developers" sections
+- Updated .gitignore to exclude dist/ folder and .zip files
+- Repository reorganized: src/, ribbon/, scripts/, templates/ folders
+
+### Technical Details
+- **Template system:** Pre-built .xlam with VBA modules → copy → inject ribbon → package
+- install.command uses same proven path detection as install_ribbon.sh
+- Tries multiple Add-ins path variations for localized macOS systems
+- build_release.sh automates: copy template → inject ribbon → create package → zip
+- Distribution package includes: .xlam, install.command, README, LICENSE, CHANGELOG
+- Ribbon UI is embedded during release build, not during user installation
+- Maintains backward compatibility with manual installation method
+- Repository structure reorganized for clarity (src/, ribbon/, scripts/, templates/)
+
 ## [1.0.6] - 2025-01-20
 
 ### Added
@@ -176,4 +210,4 @@ We use [Semantic Versioning](https://semver.org/):
 - **MINOR** version: New functionality (backwards-compatible)
 - **PATCH** version: Bug fixes (backwards-compatible)
 
-Current version: **1.0.6**
+Current version: **1.0.7**

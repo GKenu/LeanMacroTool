@@ -34,7 +34,7 @@ fi
 
 # Try to find the xlam file (check multiple versions)
 XLAM_FILE=""
-for version in "v1.0.6" "v1.0.5" "v1.0.4" "v1.0.3" "v1.0.2" "v1.0.1" ""; do
+for version in "v1.0.7" "v1.0.6" "v1.0.5" "v1.0.4" "v1.0.3" "v1.0.2" "v1.0.1" ""; do
     if [ -z "$version" ]; then
         TEST_FILE="$ADDINS_PATH/LeanMacroTools.xlam"
     else
@@ -55,10 +55,10 @@ if [ -z "$XLAM_FILE" ]; then
     echo "   $ADDINS_PATH"
     echo ""
     echo "Looking for one of:"
+    echo "   - LeanMacroTools_v1.0.7.xlam"
     echo "   - LeanMacroTools_v1.0.6.xlam"
     echo "   - LeanMacroTools_v1.0.5.xlam"
     echo "   - LeanMacroTools_v1.0.4.xlam"
-    echo "   - LeanMacroTools_v1.0.3.xlam"
     echo "   - LeanMacroTools.xlam"
     echo ""
     echo "Files currently in Add-ins folder:"
@@ -71,10 +71,15 @@ fi
 # Run inject script with properly quoted paths
 echo ""
 echo "Running ribbon injector..."
-python3 inject_ribbon.py \
+
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+python3 "$SCRIPT_DIR/inject_ribbon.py" \
   "$XLAM_FILE" \
-  customUI14.xml \
-  _rels_dot_rels_for_customUI.xml
+  "$PROJECT_ROOT/ribbon/customUI14.xml" \
+  "$PROJECT_ROOT/ribbon/_rels_dot_rels_for_customUI.xml"
 
 if [ $? -ne 0 ]; then
     echo ""
