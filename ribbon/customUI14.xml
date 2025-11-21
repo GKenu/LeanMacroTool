@@ -27,18 +27,18 @@
                   supertip="Cycle through fill patterns: Color+Border → Pattern → Original. Shortcut: Ctrl+Shift+B"/>
         </group>
         <group id="grpTracing" label="Formula Tracing">
-          <button id="btnTracePrecedents" 
-                  label="Trace Precedents" 
+          <button id="btnTracePrecedents"
+                  label="Trace Precedents"
                   size="large"
                   imageMso="TracePrecedents"
-                  onAction="TracePrecedentsDialog"
+                  onAction="ShowLeanPrecedents"
                   screentip="Trace Precedents"
                   supertip="Show cells that feed into the current formula. Shortcut: Ctrl+Shift+T"/>
-          <button id="btnTraceDependents" 
-                  label="Trace Dependents" 
+          <button id="btnTraceDependents"
+                  label="Trace Dependents"
                   size="large"
                   imageMso="TraceDependents"
-                  onAction="TraceDependentsDialog"
+                  onAction="ShowLeanDependents"
                   screentip="Trace Dependents"
                   supertip="Show cells that use the current cell. Shortcut: Ctrl+Shift+Y"/>
         </group>

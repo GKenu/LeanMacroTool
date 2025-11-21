@@ -18,23 +18,23 @@ Private Sub Workbook_Open()
     ' Number Format Cycling (Ctrl+Shift+N)
     Application.OnKey "^+N", "CycleFormatsKeyboard"
 
-    ' Font Color Cycling (Ctrl+Shift+V) - NEW in v1.0.5
+    ' Font Color Cycling (Ctrl+Shift+V)
     Application.OnKey "^+V", "CycleColorsKeyboard"
 
-    ' Fill Pattern Cycling (Ctrl+Shift+B) - NEW in v1.0.6
+    ' Fill Pattern Cycling (Ctrl+Shift+B)
     Application.OnKey "^+B", "CycleFillKeyboard"
 
     ' Trace Precedents (Ctrl+Shift+T)
-    Application.OnKey "^+T", "TracePrecedentsKeyboard"
+    Application.OnKey "^+T", "ShowLeanPrecedents"
 
     ' Trace Dependents (Ctrl+Shift+Y)
-    Application.OnKey "^+Y", "TraceDependentsKeyboard"
+    Application.OnKey "^+Y", "ShowLeanDependents"
 End Sub
 
 ----------------------------------------------------------------
 
 IMPORTANT: After adding this code to ThisWorkbook:
-1. Save the 'LeanMacroTools_v1.0.6.xlam' file on folder "/Users/[YourName]/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/"
+1. Save the 'LeanMacroTools_v2.0.0.xlam' file on folder "/Users/[YourName]/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/"
 2. Close and reopen Excel to register the shortcuts
 3. Test the shortcuts:
    - Ctrl+Shift+N (cycle number formats)

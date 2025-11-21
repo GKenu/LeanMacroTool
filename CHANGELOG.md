@@ -5,6 +5,60 @@ All notable changes to LeanMacroTool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2025-01-21
+
+### Added
+- **UserForm-based Precedent/Dependent Tracers** - Major UX overhaul replacing InputBox dialogs
+- Interactive panel with professional list-based interface
+- Click or use arrow keys to navigate through cells instantly
+- Real-time cell preview showing address, value, and formula
+- Auto-navigation on selection change (no need to press Enter)
+- Modeless panels allow working in Excel while tracer is open
+- `modLeanTracer.bas` - New adapter module bridging GetPrecedents/GetDependents with UserForms
+- `FPrecedentAnalyzer.frm/.frx` - Precedent tracer UserForm
+- `zFPrecedentAnalyzer.frm/.frx` - Dependent tracer UserForm
+- Support for keyboard shortcuts within forms (Ctrl+Shift+Home to switch to Excel)
+- Form state tracking with module-level instances (persistent across calls)
+
+### Changed
+- **BREAKING:** Replaced InputBox-based trace dialogs with professional UserForm interface
+- **Major UX Improvement:** No more number-based navigation - click cells directly in list
+- **Major UX Improvement:** Forms stay positioned and visible while navigating
+- Precedent/Dependent tracers now show all cells in scrollable list format
+- Original cell marked with "original cell" label in list
+- Keyboard shortcuts (Ctrl+Shift+T/Y) now open UserForms instead of InputBox dialogs
+- Ribbon buttons now call `ShowLeanPrecedents`/`ShowLeanDependents` directly (no wrapper functions)
+- Consolidated tracing logic into single `modLeanTracer.bas` module
+- `GetPrecedents()` and `GetDependents()` moved from modTraceTools to modLeanTracer
+
+### Removed
+- **BREAKING:** Old InputBox-based trace dialogs removed
+- `TracePrecedentsDialog`/`TraceDependentsDialog` wrapper functions removed
+- `TracePrecedentsImpl`/`TraceDependentsImpl` implementation functions removed
+- `ShowTraceDialog` function removed
+- `modTraceTools.bas` module deprecated (functionality moved to modLeanTracer)
+
+### Fixed
+- Type mismatch bug when converting string addresses to Range objects
+- Address formatting for cells with special characters in sheet names
+- Detection logic for dependent vs precedent mode (using flag instead of form visibility)
+- GetFullAddress now removes workbook brackets correctly so Range() can parse addresses
+
+### Technical Details
+- **Hybrid approach:** TTS UserForm UI + our simpler GetPrecedents/GetDependents logic
+- UserForms require Windows Excel to create/modify, but work on Mac once imported
+- Module-level flag (`mbDependentMode`) determines whether to show precedents or dependents
+- Forms call `NewPrecedents()` which adapts Collection output to 2D array format
+- Address format: Column 0 = full address (for navigation), Column 1 = short address (for display)
+- `bOriginalCellAtEnd = False` configuration places original cell at index 0
+- Forms use WithEvents for Worksheet/Workbook to update display when switching contexts
+- Binary .frx files control visual layout and cannot be regenerated on Mac
+
+### Attribution
+- UserForm interface adapted from TTS Turbo Macros with permission
+- Original TTS forms: FPrecedentAnalyzer by TTS Turbo team
+- Modified caption and integrated with LeanMacroTools tracing engine
+
 ## [1.0.7] - 2025-01-20
 
 ### Added
