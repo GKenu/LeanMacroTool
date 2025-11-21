@@ -2,9 +2,9 @@
 
 **Version 2.0.0** - 5 Powerful Features via Keyboard Shortcuts & Ribbon Tab
 
-I missed TTS Macros for personal use, so I built my own. Not perfect yet, but feel free to use and contribute!
+I missed TTS Macros for personal use (had to use your UserForm cause I'm in Mac, sorry 😬), so I built my own. Not perfect yet, but feel free to use and contribute!
 
-**Attribution:** The precedent/dependent tracer UserForm interface is adapted from [TTS Turbo Macros](https://sites.google.com/site/ttsturbo/). We are grateful for their excellent UX design and apologize for using their UserForm. The tracing logic and integration are our own implementation.
+**Attribution:** The precedent/dependent tracer UserForm interface is adapted from [Training the Street Macros](https://trainingthestreet.com/macros/) (TTS Macros for Mac Excel 2016 V1_Feb 09.xlam). We are grateful for their excellent UX design and apologize for using their UserForm. The tracing logic and integration are our own implementation.
 
 ## Features
 
@@ -46,6 +46,12 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
 
 ---
 
+## Known Issues
+
+- **Dependent Tracer**: Currently doesn't show all dependent cells in some cases. We're working on improving the detection logic. The precedent tracer works correctly.
+
+---
+
 ## Installation
 
 ### Quick Install (2 minutes) ⚡
@@ -62,7 +68,7 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
 **Step 3: Enable in Excel**
 1. Open Excel
 2. Go to **Tools > Excel Add-ins...**
-3. Check ☑ **LeanMacroTools_v1.0.7**
+3. Check ☑ **LeanMacroTools_v2.0.0**
 4. Click **OK**
 
 **That's it!** You should see a "Lean Macros" tab in the ribbon with all features ready to use.
@@ -80,14 +86,16 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
 1. Open Excel
 2. Create new blank workbook
 
-**Step 2: Import VBA Modules**
+**Step 2: Import VBA Modules and UserForms**
 1. Press **Option+F11** (VBA Editor)
 2. **File > Import File...** (or **Option+Cmd+I**) → Select **modNumberFormats.bas** → Open
 3. **File > Import File...** (or **Option+Cmd+I**) → Select **modColorFormats.bas** → Open
 4. **File > Import File...** (or **Option+Cmd+I**) → Select **modFillFormats.bas** → Open
-5. **File > Import File...** (or **Option+Cmd+I**) → Select **modTraceTools.bas** → Open
+5. **File > Import File...** (or **Option+Cmd+I**) → Select **modLeanTracer.bas** → Open
+6. **File > Import File...** (or **Option+Cmd+I**) → Select **FPrecedentAnalyzer.frm** → Open
+7. **File > Import File...** (or **Option+Cmd+I**) → Select **zFPrecedentAnalyzer.frm** → Open
 
-You should see all four modules in the left panel.
+You should see all modules and UserForms in the left panel.
 
 **Step 3: Add Keyboard Shortcuts**
 1. In VBA Editor, double-click **ThisWorkbook** (left panel)
@@ -109,10 +117,10 @@ Private Sub Workbook_Open()
     Application.OnKey "^+B", "CycleFillKeyboard"
 
     ' Trace Precedents (Ctrl+Shift+T)
-    Application.OnKey "^+T", "TracePrecedentsKeyboard"
+    Application.OnKey "^+T", "ShowLeanPrecedents"
 
     ' Trace Dependents (Ctrl+Shift+Y)
-    Application.OnKey "^+Y", "TraceDependentsKeyboard"
+    Application.OnKey "^+Y", "ShowLeanDependents"
 End Sub
 ```
 
@@ -130,7 +138,7 @@ End Sub
    **Tip:** Press **Cmd+Shift+G**, paste path above, replace [YourName]
 
 4. **File Format:** **Excel Macro-Enabled Add-In (.xlam)**
-5. **Name:** `LeanMacroTools_v1.0.7`
+5. **Name:** `LeanMacroTools_v2.0.0`
 6. **Save**
 7. Close the workbook
 
@@ -166,13 +174,13 @@ cd /path/to/LeanMacroTool
 
 # For English macOS:
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v1.0.7.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v2.0.0.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 
 # For localized macOS (Portuguese, etc.):
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v1.0.7.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v2.0.0.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 ```
@@ -221,16 +229,16 @@ Click the **"Lean Macros"** tab, then click any button:
 
 ### Trace Navigator Controls
 
-When you open the Trace Precedents/Dependents dialog:
+When you open the Trace Precedents/Dependents panel:
 
-**Navigate automatically through list:**
-- Type **+** or **n** (next) - Jump to next cell
-- Type **-** or **p** (previous) - Jump to previous cell
-- Type **0** - Go to current/origin cell
-- Type **1**, **2**, **3**, etc. - Jump directly to that cell
-- Press **ESC** or **Cancel** - Close dialog
+**Navigate through cells:**
+- **Click** any cell in the list to jump to it instantly
+- Use **arrow keys** (↑↓) to navigate through the list
+- Panel shows real-time preview: address, value, and formula
+- Panel stays open so you can explore multiple cells
+- Press **Close** button or **ESC** to close the panel
 
-The dialog stays open so you can explore multiple cells without reopening it!
+The panel is modeless - you can work in Excel while it's open! **Note:** Avoid selecting cells that are shown in the panel list, as this may cause unexpected behavior. Work on other cells instead.
 
 ---
 
@@ -349,7 +357,7 @@ Make sure all 3 files are in the same folder:
 ## Files Included
 
 ### For Users (in distribution package):
-1. **LeanMacroTools_v1.0.7.xlam** - Pre-built add-in with ribbon UI embedded
+1. **LeanMacroTools_v2.0.0.xlam** - Pre-built add-in with ribbon UI embedded
 2. **install.command** - Double-click installer (auto-detects Add-ins folder)
 3. **README.md** - This file
 4. **CHANGELOG.md** - Version history
@@ -359,13 +367,15 @@ Make sure all 3 files are in the same folder:
 1. **modNumberFormats.bas** - Number formatting code
 2. **modColorFormats.bas** - Font color cycling code
 3. **modFillFormats.bas** - Fill pattern and border cycling code
-4. **modTraceTools.bas** - Tracing code with keyboard navigation
-5. **customUI14.xml** - Ribbon tab definition
-6. **_rels_dot_rels_for_customUI.xml** - Ribbon relationships
-7. **inject_ribbon.py** - Script to add ribbon to .xlam
-8. **install_ribbon.sh** - Manual ribbon installer (for development)
-9. **build_release.sh** - Creates distribution packages
-10. **ThisWorkbook_KeyboardShortcuts.txt** - Keyboard shortcut registration guide
+4. **modLeanTracer.bas** - Tracer adapter module (bridges GetPrecedents/GetDependents with UserForms)
+5. **FPrecedentAnalyzer.frm/.frx** - Precedent tracer UserForm
+6. **zFPrecedentAnalyzer.frm/.frx** - Dependent tracer UserForm
+7. **customUI14.xml** - Ribbon tab definition
+8. **_rels_dot_rels_for_customUI.xml** - Ribbon relationships
+9. **inject_ribbon.py** - Script to add ribbon to .xlam
+10. **install_ribbon.sh** - Manual ribbon installer (for development)
+11. **build_release.sh** - Creates distribution packages
+12. **ThisWorkbook_KeyboardShortcuts.txt** - Keyboard shortcut registration guide
 
 ---
 
@@ -416,7 +426,19 @@ While this add-in provides custom macros, Excel for Mac also lets you customize 
 
 ## Version History
 
-### v1.0.7 (Current)
+### v2.0.0 (Current)
+- ✨ **MAJOR:** UserForm-based Precedent/Dependent tracers - completely redesigned UX!
+- ✨ **NEW:** Interactive panel with list-based navigation (click or arrow keys)
+- ✨ **NEW:** Real-time cell preview showing address, value, and formula
+- ✨ **NEW:** Auto-navigation on selection - instantly jump to cells
+- ✨ **NEW:** Modeless panels stay open while you work in Excel
+- 🔧 **BREAKING:** Replaced InputBox dialogs with professional UserForm interface
+- 🔧 UserForm interface adapted from Training the Street Macros
+- 📝 Original cell now appears at top of list with "(original cell)" label
+- 📝 Works cross-sheet and cross-workbook
+- 📝 Known issue: Dependent tracer doesn't show all cells in some cases
+
+### v1.0.7
 - ✨ **NEW:** Simplified installation process! Now just 2 steps
 - ✨ **NEW:** install.command - Double-click installer script
 - ✨ **NEW:** build_release.sh - Creates distribution packages

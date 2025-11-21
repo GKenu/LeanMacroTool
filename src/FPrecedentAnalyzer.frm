@@ -1,6 +1,6 @@
 VERSION 5.00
-Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} FPrecedentAnalyzer 
-   Caption         =   "TTS Turbo Precedent Tracer"
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} FPrecedentAnalyzer
+   Caption         =   "LeanMacro Precedent Tracer"
    ClientHeight    =   5220
    ClientLeft      =   40
    ClientTop       =   440
@@ -150,7 +150,7 @@ Private Sub mWS_Calculate()
   Dim sAddress As String
   Dim rCell As Range
   Dim sPrecedent As String
-  
+
   sAddress = Me.lblCellAddress.Caption
   If IsRange(sAddress) Then
     Set rCell = Range(sAddress)

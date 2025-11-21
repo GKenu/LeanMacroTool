@@ -1,6 +1,6 @@
 VERSION 5.00
-Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} zFPrecedentAnalyzer 
-   Caption         =   "TTS Turbo Precedent Tracer"
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} zFPrecedentAnalyzer
+   Caption         =   "LeanMacro Dependant Tracer"
    ClientHeight    =   5805
    ClientLeft      =   40
    ClientTop       =   440
