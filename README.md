@@ -1,8 +1,10 @@
 # LEAN MACRO TOOLS FOR EXCEL MAC
 
-**Version 1.0.7** - 5 Powerful Features via Keyboard Shortcuts & Ribbon Tab
+**Version 2.0.0** - 5 Powerful Features via Keyboard Shortcuts & Ribbon Tab
 
 I missed TTS Macros for personal use, so I built my own. Not perfect yet, but feel free to use and contribute!
+
+**Attribution:** The precedent/dependent tracer UserForm interface is adapted from [TTS Turbo Macros](https://sites.google.com/site/ttsturbo/). We are grateful for their excellent UX design and apologize for using their UserForm. The tracing logic and integration are our own implementation.
 
 ## Features
 
@@ -24,18 +26,22 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
    - Third press: Restores original formatting
    - Great for highlighting sections and creating visual separation!
 
-4. **Trace Precedents** (Ctrl+Shift+T)
+4. **Trace Precedents** (Ctrl+Shift+T) **MAJOR UPGRADE in v2.0.0**
+   - **Interactive panel with list-based navigation** - much better UX!
    - Shows cells that feed into formulas
-   - **Interactive keyboard navigation** - use +/- or n/p to navigate through list automatically!
-   - Includes current cell in the list (index 0)
-   - Dialog stays open for exploring multiple cells
+   - **Click or use arrow keys** to navigate through cells instantly
+   - **Auto-navigation** - selecting items automatically jumps to cells
+   - Real-time display of cell address, value, and formula
+   - Panel stays open while you work in Excel
    - Works cross-sheet perfectly
 
-5. **Trace Dependents** (Ctrl+Shift+Y)
+5. **Trace Dependents** (Ctrl+Shift+Y) **MAJOR UPGRADE in v2.0.0**
+   - **Interactive panel with list-based navigation** - much better UX!
    - Shows cells that use the current cell
-   - **Interactive keyboard navigation** - navigate through list with +/- keys!
-   - Includes current cell in the list
-   - Dialog stays open for exploring multiple cells
+   - **Click or use arrow keys** to navigate through cells instantly
+   - **Auto-navigation** - selecting items automatically jumps to cells
+   - Real-time display of cell address, value, and formula
+   - Panel stays open while you work in Excel
    - Works cross-sheet perfectly
 
 ---
@@ -45,7 +51,7 @@ I missed TTS Macros for personal use, so I built my own. Not perfect yet, but fe
 ### Quick Install (2 minutes) ⚡
 
 **Step 1: Download and Extract**
-1. Download the latest release: `LeanMacroTools_v1.0.7.zip`
+1. Download the latest release: `LeanMacroTools_v2.0.0.zip`
 2. Double-click to extract the zip file
 
 **Step 2: Run Installer**

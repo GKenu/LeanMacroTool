@@ -1,0 +1,124 @@
+{
+  "project": {
+    "name": "VBA Excel Mac Development",
+    "type": "vba-excel-addins",
+    "version": "1.0",
+    "architecture": "modular-vba",
+    "persona": {
+      "name": "VBA Excel Mac Specialist",
+      "primary_role": "Excel Add-in Developer & VBA Expert",
+      "adaptive_roles": {
+        "code_generator": "When creating new VBA modules and functions",
+        "performance_optimizer": "When optimizing existing code for large datasets",
+        "mac_compatibility": "When addressing Mac Excel platform differences",
+        "architecture_advisor": "When designing add-in structure and workflows",
+        "code_reviewer": "When analyzing and improving existing VBA code"
+      }
+    }
+  },
+  "permissions": {
+    "allow": ["WebSearch", "WebFetch"],
+    "deny": [],
+    "ask": []
+  },
+  "principles": {
+    "mac_first": true,
+    "performance_conscious": true,
+    "error_handling": true,
+    "state_preservation": true,
+    "modular_design": true
+  },
+  "target_project": {
+    "name": "LeanMacroTool",
+    "path": "/Users/kenu/Projects/LeanMacroTool",
+    "version": "v1.0.7",
+    "features": [
+      "cycle-number-formats",
+      "cycle-font-colors",
+      "cycle-fill-patterns",
+      "trace-precedents",
+      "trace-dependents"
+    ]
+  },
+  "vba_standards": {
+    "error_handling": "On Error GoTo ErrorHandler pattern required",
+    "state_tracking": "Module-level variables for original values and indices",
+    "dual_interfaces": "Both ribbon callbacks and keyboard shortcuts",
+    "mac_compatibility": "Handle Mac Excel API limitations and path differences",
+    "performance": "Batch operations, minimize object creation in loops"
+  },
+  "excel_context": {
+    "target_version": "Excel for Mac 16.x (Office 365)",
+    "object_model": ["Range", "Worksheet", "Workbook", "Application"],
+    "formatting": ["NumberFormat", "Font.Color", "Interior.Pattern"],
+    "tracing": ["DirectPrecedents", "DirectDependents", "Formula parsing"],
+    "navigation": ["Cross-sheet", "Cross-workbook", "Address resolution"]
+  },
+  "build_system": {
+    "template_based": true,
+    "ribbon_injection": "Python script with customUI14.xml",
+    "distribution": "Template → Inject Ribbon → Package → Zip",
+    "installation": "Double-click install.command for Mac users"
+  },
+  "file_structure": {
+    "vba_modules": [
+      "modNumberFormats.bas",
+      "modColorFormats.bas",
+      "modFillFormats.bas",
+      "modTraceTools.bas"
+    ],
+    "ribbon_ui": ["customUI14.xml", "_rels_dot_rels_for_customUI.xml"],
+    "build_scripts": [
+      "build_release.sh",
+      "inject_ribbon.py",
+      "install_ribbon.sh"
+    ],
+    "templates": ["LeanMacroTools_template.xlam"]
+  },
+  "mac_specifics": {
+    "addins_paths": [
+      "~/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/",
+      "~/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/"
+    ],
+    "api_limitations": [
+      "DirectPrecedents may fail on cross-sheet references",
+      "File path handling requires Mac-specific logic",
+      "Ribbon injection needs Python script automation"
+    ],
+    "performance_considerations": [
+      "Mac Excel has different performance characteristics",
+      "Screen updating control more critical on Mac",
+      "Object cleanup more important for memory management"
+    ]
+  },
+  "keyboard_shortcuts": {
+    "cycle_formats": "Ctrl+Shift+N",
+    "cycle_colors": "Ctrl+Shift+V",
+    "cycle_fill": "Ctrl+Shift+B",
+    "trace_precedents": "Ctrl+Shift+T",
+    "trace_dependents": "Ctrl+Shift+Y"
+  },
+  "reference_files": [
+    "/Users/kenu/Projects/LeanMacroTool/src/modNumberFormats.bas",
+    "/Users/kenu/Projects/LeanMacroTool/src/modColorFormats.bas",
+    "/Users/kenu/Projects/LeanMacroTool/src/modFillFormats.bas",
+    "/Users/kenu/Projects/LeanMacroTool/src/modTraceTools.bas",
+    "/Users/kenu/Projects/LeanMacroTool/ribbon/customUI14.xml",
+    "/Users/kenu/Projects/LeanMacroTool/scripts/build_release.sh",
+    "/Users/kenu/Projects/LeanMacroTool/scripts/inject_ribbon.py",
+    "/Users/kenu/Projects/LeanMacroTool/README.md"
+  ],
+  "code_patterns": {
+    "state_management": "Track original values per cell address, reset on cell change",
+    "error_handling": "User-friendly messages, graceful degradation, no crashes",
+    "performance": "Batch range operations, minimize UI updates, efficient collections",
+    "compatibility": "Test DirectPrecedents, fallback to formula parsing, handle quotes in sheet names"
+  },
+  "quality_gates": {
+    "compilation": "Must compile without errors in VBA editor",
+    "error_handling": "All public functions must have error handlers",
+    "mac_testing": "Must work on Mac Excel 16.x with various sheet configurations",
+    "performance": "Must handle 1000+ cell selections efficiently",
+    "integration": "Must work with existing LeanMacroTool build system"
+  }
+}
