@@ -405,7 +405,7 @@ While this add-in provides custom macros, Excel for Mac also lets you customize 
 |---------|-------------------|-------------|
 | **Increase Indent** | Ctrl+Shift+] | Move content farther from cell border |
 | **Decrease Indent** | Ctrl+Shift+[ | Move content closer to cell border |
-| **Increase Decimal** | Ctrl+Shift++ | Show more decimal places |
+| **Increase Decimal** | Ctrl+Shift+, | Show more decimal places |
 | **Decrease Decimal** | Ctrl+Shift+. | Show fewer decimal places |
 
 ### Setup Instructions
