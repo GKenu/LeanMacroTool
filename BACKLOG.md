@@ -15,6 +15,7 @@ This file tracks known issues and planned improvements for LeanMacroTools.
       c. ✅ **IMPLEMENTED v2.1.0** - Include in Ribbon "How to Use" button with quick guide
       d. ✅ **IMPLEMENTED v2.1.0** - Show range when it is a range instead of individual cells
       e. PENDING: Include a white background when cycling fill patterns
+      f. PENDING: Include a iferror functionality that copies current formula into a iferror([current formula],"na")
    - **Impact:** Much better user experience
    - **Status:** All items completed in v2.1.0. See [v2.1.0 Release Notes](docs/releases/v2.1.0_IMPLEMENTATION_NOTES.md) for details
 
