@@ -9,14 +9,14 @@ This file tracks known issues and planned improvements for LeanMacroTools.
 ### High Priority
 
 1. **Tracer Panel - Improvements**
-   - **Issue:** 
-      a. Show in order of formula instead of order of cells with smaller number to larger
-      b. Implement a button on ribbon (no shortcut) that outputs the whole spreadsheet into a pdf file (not implemented) ignoring printing rage, one sheet per page or something like that
-      c. Include in Ribbon "How to Use" 
-      d. Show range when it is a range instead of individual cells
+   - **Issue:**
+      a. ✅ **IMPLEMENTED v2.1.0** - Show in order of formula instead of order of cells with smaller number to larger
+      b. ✅ **IMPLEMENTED v2.1.0** - Implement a button on ribbon (no shortcut) that outputs the whole spreadsheet into a pdf file ignoring printing range, one sheet per page with auto-range detection
+      c. Include in Ribbon "How to Use"
+      d. ✅ **IMPLEMENTED v2.1.0** - Show range when it is a range instead of individual cells
    - **Impact:** Much better user experience
-   - **Status:** Needs investigation on how to implement this feature
-   - **Workaround:** User as it is. It works.
+   - **Status:** Items a, b, d completed in v2.1.0. See [v2.1.0 Release Notes](docs/releases/v2.1.0_IMPLEMENTATION_NOTES.md) for details
+   - **Remaining:** Item c (How to Use in Ribbon) - planned for future release
 
 2. **Dependent Tracer - Incomplete Cell Detection**
    - **Issue:** The dependent tracer doesn't always detect and display all dependent cells
