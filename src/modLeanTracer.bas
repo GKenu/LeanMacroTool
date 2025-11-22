@@ -19,8 +19,9 @@ Public Const TTS_TITLE As String = "Lean Macro Tools"  ' Form title for message 
 ' PUBLIC INTERFACE - Call these from keyboard shortcuts
 ' ============================================================================
 
-Public Sub ShowLeanPrecedents()
+Public Sub ShowLeanPrecedents(Optional control As Object = Nothing)
     ' Show precedent tracer for active cell
+    ' Ribbon callback - Optional control parameter for ribbon compatibility
     If ActiveCell Is Nothing Then
         MsgBox "Please select a cell first.", vbExclamation, "Lean Precedent Tracer"
         Exit Sub
@@ -41,8 +42,9 @@ Public Sub ShowLeanPrecedents()
     End With
 End Sub
 
-Public Sub ShowLeanDependents()
+Public Sub ShowLeanDependents(Optional control As Object = Nothing)
     ' Show dependent tracer for active cell
+    ' Ribbon callback - Optional control parameter for ribbon compatibility
     If ActiveCell Is Nothing Then
         MsgBox "Please select a cell first.", vbExclamation, "Lean Dependent Tracer"
         Exit Sub
