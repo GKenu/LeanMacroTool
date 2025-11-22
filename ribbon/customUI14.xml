@@ -51,6 +51,15 @@
                   screentip="Export to PDF"
                   supertip="Export entire workbook to PDF. One page per sheet, auto-fits used range, ignores print areas."/>
         </group>
+        <group id="grpHelp" label="Help">
+          <button id="btnHelp"
+                  label="How to Use"
+                  size="large"
+                  imageMso="Help"
+                  onAction="ShowHelp"
+                  screentip="How to Use"
+                  supertip="Quick guide to all Lean Macro Tools features and keyboard shortcuts."/>
+        </group>
       </tab>
     </tabs>
   </ribbon>

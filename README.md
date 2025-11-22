@@ -225,6 +225,7 @@ Click the **"Lean Macros"** tab, then click any button:
 - **Trace Precedents** - See formula inputs
 - **Trace Dependents** - See what uses this cell
 - **Export to PDF** - Export entire workbook to PDF (smart auto-detection)
+- **How to Use** - Quick guide with all features and shortcuts
 
 ### Via Keyboard (Faster!)
 
