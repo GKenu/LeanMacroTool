@@ -8,13 +8,19 @@ This file tracks known issues and planned improvements for LeanMacroTools.
 
 ### High Priority
 
-1. **Dependent Tracer - Incomplete Cell Detection**
+1. **Tracer Panel - Improvements**
+   - **Issue:** Show in order of formula instead of order of cells with smaller number to larger + Show range when it is a range instead of individual cells
+   - **Impact:** Much better user experience
+   - **Status:** Needs investigation on how to implement this feature
+   - **Workaround:** User as it is. It works.
+
+2. **Dependent Tracer - Incomplete Cell Detection**
    - **Issue:** The dependent tracer doesn't always detect and display all dependent cells
    - **Impact:** Users may miss some cells that reference the selected cell
    - **Status:** Investigating root cause in `GetDependents()` function
    - **Workaround:** Cross-verify with Excel's built-in "Trace Dependents" feature
 
-2. **Tracer Panel - Selection Conflict**
+3. **Tracer Panel - Selection Conflict**
    - **Issue:** Selecting cells that are shown in the tracer panel list causes unexpected behavior
    - **Impact:** Panel may jump or refresh incorrectly when navigating to listed cells
    - **Status:** Needs investigation - likely related to WithEvents triggering on selection change
