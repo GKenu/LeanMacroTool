@@ -22,22 +22,22 @@ Private Sub ShowHelpImpl()
 
     helpText = "Lean Macro Tools - Quick Guide" & vbCrLf & vbCrLf & _
                "FORMATTING:" & vbCrLf & _
-               "• Cycle Formats (Ctrl+Shift+N)" & vbCrLf & _
+               "- Cycle Formats (Ctrl+Shift+N)" & vbCrLf & _
                "  Change number formats (thousands, %, multiples, currency)" & vbCrLf & vbCrLf & _
-               "• Cycle Colors (Ctrl+Shift+V)" & vbCrLf & _
+               "- Cycle Colors (Ctrl+Shift+V)" & vbCrLf & _
                "  Change font colors (blue, green, red, grey, black)" & vbCrLf & vbCrLf & _
-               "• Cycle Fill (Ctrl+Shift+B)" & vbCrLf & _
+               "- Cycle Fill (Ctrl+Shift+B)" & vbCrLf & _
                "  Change fill patterns and borders" & vbCrLf & vbCrLf & _
                "TRACING:" & vbCrLf & _
-               "• Trace Precedents (Ctrl+Shift+T)" & vbCrLf & _
+               "- Trace Precedents (Ctrl+Shift+T)" & vbCrLf & _
                "  Show formula inputs (cells feeding into formulas)" & vbCrLf & vbCrLf & _
-               "• Trace Dependents (Ctrl+Shift+Y)" & vbCrLf & _
+               "- Trace Dependents (Ctrl+Shift+Y)" & vbCrLf & _
                "  Show what uses this cell (cells referencing current cell)" & vbCrLf & vbCrLf & _
                "EXPORT:" & vbCrLf & _
-               "• Export to PDF" & vbCrLf & _
+               "- Export to PDF" & vbCrLf & _
                "  One-click PDF export with auto-range detection" & vbCrLf & _
                "  Perfect for sharing or uploading to AI tools!" & vbCrLf & vbCrLf & _
-               "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" & vbCrLf & _
+               "-------------------------------------------" & vbCrLf & _
                "Find all features in the ""Lean Macros"" ribbon tab!" & vbCrLf & _
                "Tip: Use keyboard shortcuts for faster workflow!"
 
