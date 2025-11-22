@@ -9,7 +9,11 @@ This file tracks known issues and planned improvements for LeanMacroTools.
 ### High Priority
 
 1. **Tracer Panel - Improvements**
-   - **Issue:** Show in order of formula instead of order of cells with smaller number to larger + Include in Ribbon "How to Use" + Show range when it is a range instead of individual cells
+   - **Issue:** 
+      a. Show in order of formula instead of order of cells with smaller number to larger
+      b. Implement a button on ribbon (no shortcut) that outputs the whole spreadsheet into a pdf file (not implemented) ignoring printing rage, one sheet per page or something like that
+      c. Include in Ribbon "How to Use" 
+      d. Show range when it is a range instead of individual cells
    - **Impact:** Much better user experience
    - **Status:** Needs investigation on how to implement this feature
    - **Workaround:** User as it is. It works.
@@ -72,4 +76,4 @@ If you'd like to help tackle any of these issues, please:
 
 ---
 
-**Last Updated:** 2025-01-21 (v2.0.0)
+**Last Updated:** 2025-01-22 (v2.1.0 - Items 1a, 1b, 1d implemented)

@@ -190,15 +190,23 @@ Public Function NewPrecedents(rCell As Range) As Variant
     If bOriginalCellAtEnd Then
         ' Precedents first (1 to Count), then original cell (Count+1)
         For i = 1 To precedents.Count
-            ' precedents(i) is a string address, convert to Range
+            ' v2.1.0: precedents(i) is already a string address with formula order preserved
+            ' Convert to Range to get proper formatting, but maintain order
             On Error Resume Next
             Set prec = Range(precedents(i))
             On Error GoTo 0
             If Not prec Is Nothing Then
+                ' Get formatted addresses (full and short versions)
                 cellAddress = GetAddress(prec)
                 precedentArray(i, 1) = Left$(cellAddress, InStr(cellAddress, "|") - 1)  ' Full
                 precedentArray(i, 2) = Mid$(cellAddress, InStr(cellAddress, "|") + 1)   ' Short
                 precedentArray(i, 3) = ""  ' Display (filled by form)
+            Else
+                ' If Range() failed, use the string address directly
+                ' This handles cases where the range might not be valid
+                precedentArray(i, 1) = precedents(i)  ' Full address
+                precedentArray(i, 2) = precedents(i)  ' Short address (same)
+                precedentArray(i, 3) = ""
             End If
         Next i
 
@@ -215,14 +223,22 @@ Public Function NewPrecedents(rCell As Range) As Variant
         precedentArray(1, 3) = ""
 
         For i = 1 To precedents.Count
-            ' precedents(i) is a string address, convert to Range
+            ' v2.1.0: precedents(i) is already a string address with formula order preserved
+            ' Convert to Range to get proper formatting, but maintain order
             On Error Resume Next
             Set prec = Range(precedents(i))
             On Error GoTo 0
             If Not prec Is Nothing Then
+                ' Get formatted addresses (full and short versions)
                 cellAddress = GetAddress(prec)
                 precedentArray(i + 1, 1) = Left$(cellAddress, InStr(cellAddress, "|") - 1)
                 precedentArray(i + 1, 2) = Mid$(cellAddress, InStr(cellAddress, "|") + 1)
+                precedentArray(i + 1, 3) = ""
+            Else
+                ' If Range() failed, use the string address directly
+                ' This handles cases where the range might not be valid
+                precedentArray(i + 1, 1) = precedents(i)  ' Full address
+                precedentArray(i + 1, 2) = precedents(i)  ' Short address (same)
                 precedentArray(i + 1, 3) = ""
             End If
         Next i
@@ -238,37 +254,15 @@ End Function
 Public Function GetPrecedents(sourceCell As Range) As Collection
     On Error GoTo ErrorHandler
 
-    Dim precedents As Range
-    Dim area As Range
-    Dim cell As Range
     Dim result As New Collection
-    Dim cellAddress As String
     Dim parsedRefs As Collection
 
-    Set result = New Collection
     Set GetPrecedents = result
 
-    ' Try DirectPrecedents first (works for same-sheet references)
-    On Error Resume Next
-    Set precedents = sourceCell.DirectPrecedents
-    On Error GoTo ErrorHandler
-
-    If Not precedents Is Nothing Then
-        ' Add cells from DirectPrecedents
-        For Each area In precedents.Areas
-            For Each cell In area.Cells
-                cellAddress = GetFullAddress(cell)
-                On Error Resume Next
-                result.Add cellAddress
-                On Error GoTo ErrorHandler
-            Next cell
-        Next area
-    End If
-
-    ' Only parse formula if DirectPrecedents returned nothing
-    ' This catches cross-sheet references that DirectPrecedents might miss on Mac
-    ' and prevents duplication when DirectPrecedents works correctly
-    If result.Count = 0 And sourceCell.HasFormula Then
+    ' v2.1.0: Always use ParseFormulaReferences to preserve formula order
+    ' DirectPrecedents returns cells in position order (A1, B1, C1...) not formula order
+    ' ParseFormulaReferences preserves the order references appear in the formula
+    If sourceCell.HasFormula Then
         Set parsedRefs = ParseFormulaReferences(sourceCell)
 
         ' Add parsed references
@@ -448,7 +442,6 @@ Private Function ExpandCellRange(sheetName As String, cellRef As String, wb As W
     Dim result As New Collection
     Dim ws As Worksheet
     Dim rng As Range
-    Dim cell As Range
     Dim fullAddr As String
 
     Set ExpandCellRange = result
@@ -468,13 +461,13 @@ Private Function ExpandCellRange(sheetName As String, cellRef As String, wb As W
 
     If rng Is Nothing Then Exit Function
 
-    ' Add each cell in range
-    For Each cell In rng.Cells
-        fullAddr = GetFullAddress(cell)
-        On Error Resume Next
-        result.Add fullAddr
-        On Error GoTo ErrorHandler
-    Next cell
+    ' v2.1.0: Return entire range as single item instead of expanding
+    ' This preserves ranges like "A1:A10" for cleaner display
+    ' If it's a single cell, return it; if it's a range, return the range notation
+    fullAddr = GetFullAddress(rng)
+    On Error Resume Next
+    result.Add fullAddr
+    On Error GoTo ErrorHandler
 
     Set ExpandCellRange = result
     Exit Function

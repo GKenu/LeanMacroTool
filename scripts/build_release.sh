@@ -1,11 +1,11 @@
 #!/bin/bash
 # Build LeanMacroTools release package
 # This script creates a distribution-ready package for users
-# Version 2.0.0
+# Version 2.1.0
 
 set -e  # Exit on error
 
-VERSION="v2.0.0"
+VERSION="v2.1.0"
 DIST_DIR="dist"
 PACKAGE_NAME="LeanMacroTools_${VERSION}"
 XLAM_FILE="LeanMacroTools_${VERSION}.xlam"

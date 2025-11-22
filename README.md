@@ -1,6 +1,6 @@
 # LEAN MACRO TOOLS FOR EXCEL MAC
 
-**Version 2.0.0** - 5 Powerful Features via Keyboard Shortcuts & Ribbon Tab
+**Version 2.1.0** - 6 Powerful Features via Keyboard Shortcuts & Ribbon Tab
 
 I missed TTS Macros for personal use (had to use your UserForm cause I'm in Mac, sorry 😬), so I built my own. Not perfect yet, but feel free to use and contribute!
 
@@ -44,6 +44,14 @@ I missed TTS Macros for personal use (had to use your UserForm cause I'm in Mac,
    - Panel stays open while you work in Excel
    - Works cross-sheet perfectly
 
+6. **Export to PDF** (Ribbon only) **NEW in v2.1.0**
+   - **One-click PDF export** - Export entire workbook to PDF instantly
+   - **Smart auto-detection** - Automatically finds and exports only the used range per sheet
+   - **One page per sheet** - Each worksheet fits on a single page (auto-scaled)
+   - **Saves alongside workbook** - PDF created in same folder as your Excel file
+   - **Perfect for AI analysis** 🤖 - Export your spreadsheet and upload to ChatGPT, Claude, or other AI tools to discuss outputs, validate assumptions, and analyze results. AIs work much better with PDFs than raw spreadsheets!
+   - Great for sharing read-only versions or archiving your work
+
 ---
 
 ## Known Issues
@@ -57,7 +65,7 @@ I missed TTS Macros for personal use (had to use your UserForm cause I'm in Mac,
 ### Quick Install (2 minutes) ⚡
 
 **Step 1: Download and Extract**
-1. Download the latest release: `LeanMacroTools_v2.0.0.zip`
+1. Download the latest release: `LeanMacroTools_v2.1.0.zip`
 2. Double-click to extract the zip file
 
 **Step 2: Run Installer**
@@ -68,7 +76,7 @@ I missed TTS Macros for personal use (had to use your UserForm cause I'm in Mac,
 **Step 3: Enable in Excel**
 1. Open Excel
 2. Go to **Tools > Excel Add-ins...**
-3. Check ☑ **LeanMacroTools_v2.0.0**
+3. Check ☑ **LeanMacroTools_v2.1.0**
 4. Click **OK**
 
 **That's it!** You should see a "Lean Macros" tab in the ribbon with all features ready to use.
@@ -138,7 +146,7 @@ End Sub
    **Tip:** Press **Cmd+Shift+G**, paste path above, replace [YourName]
 
 4. **File Format:** **Excel Macro-Enabled Add-In (.xlam)**
-5. **Name:** `LeanMacroTools_v2.0.0`
+5. **Name:** `LeanMacroTools_v2.1.0`
 6. **Save**
 7. Close the workbook
 
@@ -174,13 +182,13 @@ cd /path/to/LeanMacroTool
 
 # For English macOS:
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v2.0.0.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/LeanMacroTools_v2.1.0.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 
 # For localized macOS (Portuguese, etc.):
 python3 inject_ribbon.py \
-  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v2.0.0.xlam" \
+  "$HOME/Library/Group Containers/UBF8T346G9.Office/User Content.localized/Add-Ins.localized/LeanMacroTools_v2.1.0.xlam" \
   customUI14.xml \
   _rels_dot_rels_for_customUI.xml
 ```
@@ -216,6 +224,7 @@ Click the **"Lean Macros"** tab, then click any button:
 - **Cycle Fill** - Change fill pattern and borders
 - **Trace Precedents** - See formula inputs
 - **Trace Dependents** - See what uses this cell
+- **Export to PDF** - Export entire workbook to PDF (smart auto-detection)
 
 ### Via Keyboard (Faster!)
 
@@ -239,6 +248,25 @@ When you open the Trace Precedents/Dependents panel:
 - Press **Close** button or **ESC** to close the panel
 
 The panel is modeless - you can work in Excel while it's open! **Note:** Avoid selecting cells that are shown in the panel list, as this may cause unexpected behavior. Work on other cells instead.
+
+### PDF Export
+
+Click **Export to PDF** in the ribbon to create a PDF of your entire workbook:
+
+**What it does:**
+- Automatically detects the used range on each sheet (no manual print area setup needed)
+- Exports each sheet on a single page (auto-scales to fit)
+- Saves the PDF in the same folder as your Excel file with the same name
+- Shows confirmation dialog with file path before exporting
+
+**Perfect for AI collaboration:**
+Export your spreadsheet and upload the PDF to AI tools like ChatGPT, Claude, Gemini, or Copilot to:
+- Validate your assumptions and logic
+- Discuss outputs and findings
+- Get help interpreting complex results
+- Review data patterns and trends
+
+Why PDF? AIs can easily read and analyze PDF tables, making it much better than uploading raw .xlsx files for discussion!
 
 ---
 
@@ -357,7 +385,7 @@ Make sure all 3 files are in the same folder:
 ## Files Included
 
 ### For Users (in distribution package):
-1. **LeanMacroTools_v2.0.0.xlam** - Pre-built add-in with ribbon UI embedded
+1. **LeanMacroTools_v2.1.0.xlam** - Pre-built add-in with ribbon UI embedded
 2. **install.command** - Double-click installer (auto-detects Add-ins folder)
 3. **README.md** - This file
 4. **CHANGELOG.md** - Version history
@@ -426,7 +454,16 @@ While this add-in provides custom macros, Excel for Mac also lets you customize 
 
 ## Version History
 
-### v2.0.0 (Current)
+### v2.1.0 (Current)
+- ✨ **NEW:** Formula order preservation in tracer - cells now display in formula order!
+- ✨ **NEW:** Range display in tracer - ranges shown as "A1:A10" instead of individual cells
+- ✨ **NEW:** Export to PDF feature - export entire workbook with auto-range detection
+- ✨ **NEW:** PDF export with one page per sheet, ignores print areas
+- 📝 Clicking ranges in tracer now selects entire range
+- 📝 New "Export" group in ribbon with PDF button
+- 📝 High-quality PDF output suitable for printing
+
+### v2.0.0
 - ✨ **MAJOR:** UserForm-based Precedent/Dependent tracers - completely redesigned UX!
 - ✨ **NEW:** Interactive panel with list-based navigation (click or arrow keys)
 - ✨ **NEW:** Real-time cell preview showing address, value, and formula

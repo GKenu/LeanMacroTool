@@ -42,6 +42,15 @@
                   screentip="Trace Dependents"
                   supertip="Show cells that use the current cell. Shortcut: Ctrl+Shift+Y"/>
         </group>
+        <group id="grpExport" label="Export">
+          <button id="btnExportPDF"
+                  label="Export to PDF"
+                  size="large"
+                  imageMso="ExportToPDF"
+                  onAction="ExportWorkbookToPDF"
+                  screentip="Export to PDF"
+                  supertip="Export entire workbook to PDF. One page per sheet, auto-fits used range, ignores print areas."/>
+        </group>
       </tab>
     </tabs>
   </ribbon>

@@ -5,6 +5,34 @@ All notable changes to LeanMacroTool will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-01-22
+
+### Added
+- **Formula Order Preservation in Tracer** - Precedents/dependents now display in the order they appear in formulas
+- **Range Display in Tracer** - Ranges shown as "A1:A10" instead of expanding to individual cells (A1, A2, A3...)
+- **Export to PDF Feature** - New ribbon button to export entire workbook to PDF
+- **Auto-Range Detection for PDF** - Automatically detects used range per sheet (e.g., A1:L50 if data ends at column L, row 50)
+- **One Page Per Sheet PDF** - Each worksheet exports as a single page (auto-fits to page)
+- `modPDFExport.bas` - New module for PDF export functionality
+- New "Export" group in ribbon UI with "Export to PDF" button
+- High-quality PDF output (xlQualityMaximum) suitable for printing
+
+### Changed
+- `ParseFormulaReferences()` now preserves the order that cell references appear in formulas
+- `ExpandCellRange()` returns entire ranges (e.g., "A1:A10") instead of expanding to individual cells
+- `GetPrecedents()` now uses `ParseFormulaReferences()` exclusively for consistent formula-order behavior
+- Tracer forms updated to handle range navigation (clicking "A1:A10" selects entire range)
+- PDF export ignores existing print areas and uses worksheet's UsedRange instead
+- PDF export does not auto-open after creation (shows success message with file path)
+
+### Technical Details
+- Formula order tracking: References displayed in the sequence they appear in formula string
+- Range preservation: Ranges like A1:A10 kept intact for cleaner display and proper navigation
+- PDF export workflow: Detect UsedRange → Set PrintArea → Export → Restore original settings
+- PageSetup configuration: FitToPagesWide=1, FitToPagesTall=1 for one page per sheet
+- Error handling with settings restoration even if export fails
+- Compatible with Mac Excel 16.x ExportAsFixedFormat API
+
 ## [2.0.0] - 2025-01-21
 
 ### Added

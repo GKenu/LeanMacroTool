@@ -1,11 +1,11 @@
 #!/bin/bash
 # LeanMacroTools Installer for macOS
 # Double-click this file to install the add-in
-# Version 2.0.0
+# Version 2.1.0
 
 echo ""
 echo "═══════════════════════════════════════════════════"
-echo "  LeanMacroTools v2.0.0 Installer"
+echo "  LeanMacroTools v2.1.0 Installer"
 echo "═══════════════════════════════════════════════════"
 echo ""
 
@@ -45,9 +45,9 @@ if [ -z "$ADDINS_PATH" ]; then
 fi
 
 # Check if the xlam file exists in the script directory
-XLAM_SOURCE="$SCRIPT_DIR/LeanMacroTools_v2.0.0.xlam"
+XLAM_SOURCE="$SCRIPT_DIR/LeanMacroTools_v2.1.0.xlam"
 if [ ! -f "$XLAM_SOURCE" ]; then
-    echo "❌ Error: LeanMacroTools_v2.0.0.xlam not found!"
+    echo "❌ Error: LeanMacroTools_v2.1.0.xlam not found!"
     echo ""
     echo "Expected location: $XLAM_SOURCE"
     echo ""
@@ -70,7 +70,7 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "1. Open Microsoft Excel"
     echo "2. Go to Tools > Excel Add-ins..."
-    echo "3. Check ☑ LeanMacroTools_v2.0.0"
+    echo "3. Check ☑ LeanMacroTools_v2.1.0"
     echo "4. Click OK"
     echo ""
     echo "You should see a 'Lean Macros' tab in the ribbon!"
