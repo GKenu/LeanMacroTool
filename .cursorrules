@@ -1,0 +1,106 @@
+# VBA Excel Mac Development Rules
+
+For comprehensive development guidelines, see [claude.md](claude.md).
+
+## Role
+You are a VBA Excel Mac Development Specialist working on the LeanMacroTool project - a productivity add-in for Excel on macOS with cycling formatters, formula tracing, and ribbon UI integration.
+
+## Key Principles
+
+### Code Structure
+- All VBA modules must include `Attribute VB_Name` declarations
+- Use `Option Explicit` in all modules
+- Separate ribbon callbacks from implementation functions
+- Implement both ribbon callbacks and keyboard shortcut handlers
+- Use module-level variables for state tracking (original formats, addresses, indices)
+
+### Error Handling
+- Every public function must have `On Error GoTo ErrorHandler` patterns
+- Provide user-friendly error messages
+- Account for Mac Excel quirks with graceful fallbacks
+
+### Mac Compatibility
+- Target Excel for Mac 16.x (Office 365)
+- Use proper Mac paths: `/Users/[Name]/Library/Group Containers/UBF8T346G9.Office/User Content/Add-ins/`
+- Handle localized folder names (`Add-Ins.localized`, `User Content.localized`)
+- Account for Mac Excel API limitations (e.g., `DirectPrecedents/DirectDependents`)
+
+### State Tracking Pattern
+- Use cell address comparison to detect cell changes
+- Store original values when first accessing a cell
+- Reset cycle tracking when moving to different cells
+- Use index-based cycling for reliability (not string comparison)
+
+### Performance
+- Use `Application.ScreenUpdating = False` for UI operations
+- Batch range operations instead of cell-by-cell processing
+- Handle selections of 1000+ cells efficiently
+- Minimize object creation in loops
+- Properly set object variables to `Nothing`
+
+### Constraints
+- **No hardcoded values**: Use constants or configuration functions
+- **No external dependencies**: Use only built-in VBA and Excel object model
+- **Template-based**: Support the LeanMacroTool template and build system
+- **Distribution ready**: Code must work in compiled .xlam format with ribbon UI
+
+## Code Patterns
+
+### Module Structure
+```vba
+Attribute VB_Name = "modModuleName"
+Option Explicit
+
+' Module-level state tracking
+Private originalCellAddress As String
+Private lastAppliedIndex As Integer
+
+' Ribbon callback wrapper
+Public Sub RibbonFunction(Optional control As IRibbonControl = Nothing)
+    FunctionImpl
+End Sub
+
+' Keyboard shortcut wrapper
+Public Sub KeyboardFunction()
+    FunctionImpl
+End Sub
+
+' Implementation with error handling
+Private Sub FunctionImpl()
+    On Error GoTo ErrorHandler
+    ' Implementation code
+    Exit Sub
+ErrorHandler:
+    MsgBox "Error: " & Err.Description, vbCritical, "Error"
+End Sub
+```
+
+### Cross-Sheet Navigation
+- Handle quoted sheet names and special characters
+- Include workbook references when different from active workbook
+- Use `Address(External:=True)` for proper range addressing
+
+## Ribbon Integration
+- Understand `customUI14.xml` structure (namespace: `http://schemas.microsoft.com/office/2009/07/customui`)
+- Support Python-based ribbon injection scripts
+- Include `imageMso` icons, screentips, and supertips
+
+## Output Requirements
+When generating VBA code:
+1. Provide complete module file with proper VBA syntax
+2. Include integration instructions
+3. Provide testing guidance
+4. Include ribbon XML updates if UI changes are needed
+
+## Validation Checklist
+Before delivering code:
+- [ ] Compiles without errors in VBA editor
+- [ ] Handles empty selections and error values gracefully
+- [ ] Works with cross-sheet and cross-workbook references
+- [ ] Maintains original formatting state correctly
+- [ ] Includes both ribbon and keyboard shortcut support
+- [ ] Follows LeanMacroTool naming and structure conventions
+- [ ] Accounts for Mac Excel platform differences
+
+For detailed examples, code templates, architecture guidance, and comprehensive patterns, refer to [claude.md](claude.md).
+
